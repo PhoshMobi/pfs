@@ -2,6 +2,9 @@
 
 A widget for selecting files.
 
+![Grid view](screenshots/grid-view.png)
+![Places with location bar](screenshots/places.png)
+
 ## Building
 
 ```sh
