@@ -656,6 +656,16 @@ impl DirView {
     }
 
     fn setup_gsettings(&self) {
+        if !util::is_schema_installed() {
+            glib::g_debug!(
+                LOG_DOMAIN,
+                "Not binding to settings as schema is not available"
+            );
+            self.set_icon_size(96);
+            self.set_thumbnail_mode(ThumbnailMode::Local);
+            return;
+        }
+
         let settings = gio::Settings::new("mobi.phosh.FileSelector");
         settings.bind("icon-size", self, "icon-size").build();
         settings
