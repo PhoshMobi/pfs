@@ -499,20 +499,30 @@ impl FileSelector {
     }
 
     fn setup_gsettings(&self) {
+        if !util::is_schema_installed() {
+            glib::g_debug!(
+                LOG_DOMAIN,
+                "Not creating settings as schema is not available"
+            );
+            return;
+        }
+
         let settings = gio::Settings::new("mobi.phosh.FileSelector");
         *self.imp().settings.borrow_mut() = Some(settings);
     }
 
     fn set_sort_mode(&self, name: &str, reversed: bool) {
-        let binding = self.imp().settings.borrow();
-        let settings = binding.as_ref().unwrap();
-
         let enum_type = glib::EnumClass::with_type(SortMode::static_type()).unwrap();
         let mode = enum_type
             .value_by_nick(name)
             .expect("Invalid Sort mode {name}");
-        let _ = settings.set_enum("sort-by", mode.value());
-        let _ = settings.set_boolean("sort-reverse", reversed);
+
+        let binding = self.imp().settings.borrow();
+        if let Some(settings) = binding.as_ref() {
+            let _ = settings.set_enum("sort-by", mode.value());
+            let _ = settings.set_boolean("sort-reverse", reversed);
+        };
+
         let m = unsafe { SortMode::from_glib(mode.value()) };
         self.imp().dir_view.get().set_sorting(m, reversed);
     }
@@ -538,11 +548,16 @@ impl FileSelector {
         );
 
         let binding = self.imp().settings.borrow();
-        let settings = binding.as_ref().unwrap();
+        let (sort_by_value, reversed) = if let Some(settings) = binding.as_ref() {
+            let sort_by_value = settings.enum_("sort-by");
+            let reversed = settings.boolean("sort-reverse");
+            (sort_by_value, reversed)
+        } else {
+            (0, false)
+        };
 
         let enum_type = glib::EnumClass::with_type(SortMode::static_type()).unwrap();
-        let mode_name = enum_type.value(settings.enum_("sort-by")).unwrap().nick();
-        let reversed = settings.boolean("sort-reverse");
+        let mode_name = enum_type.value(sort_by_value).unwrap().nick();
         let sort_by = (mode_name, reversed);
         stateful_action!(
             actions,

@@ -88,3 +88,13 @@ pub fn is_valid_folder(folder: &Option<gio::File>) -> bool {
 
     folder.as_ref().unwrap().path().is_some()
 }
+
+pub fn is_schema_installed() -> bool {
+    let source = gio::SettingsSchemaSource::default();
+    if source.is_none() {
+        return false;
+    }
+    let source = source.unwrap();
+
+    source.lookup("mobi.phosh.FileSelector", true).is_some()
+}
