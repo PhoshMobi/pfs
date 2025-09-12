@@ -18,10 +18,10 @@ path = "src/examples/open/pfs_open.rs"
 
 [dependencies]
 gettext-rs = { version = "0.7", features = ["gettext-system"] }
-glib-macros = "0.20.5"
-gtk = { version = "0.9", package = "gtk4", features = ["gnome_47"] }
+glib-macros = "0.21"
+gtk = { version = "0.10", package = "gtk4", features = ["gnome_47"] }
 
 [dependencies.adw]
 package = "libadwaita"
-version = "0.7"
+version = "0.8"
 features = ["v1_6"]

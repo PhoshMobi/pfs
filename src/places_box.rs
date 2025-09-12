@@ -119,7 +119,8 @@ mod imp {
 
 glib::wrapper! {
     pub struct PlacesBox(ObjectSubclass<imp::PlacesBox>)
-        @extends adw::Bin, gtk::Widget;
+        @extends adw::Bin, gtk::Widget,
+        @implements gtk::Accessible, gtk::Buildable, gtk::ConstraintTarget;
 }
 
 impl Default for PlacesBox {
