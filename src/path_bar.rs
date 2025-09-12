@@ -122,7 +122,8 @@ mod imp {
 
 glib::wrapper! {
     pub struct PathBar(ObjectSubclass<imp::PathBar>)
-        @extends adw::Bin, gtk::Widget;
+        @extends adw::Bin, gtk::Widget,
+        @implements gtk::Accessible, gtk::Buildable, gtk::ConstraintTarget;
 }
 
 impl Default for PathBar {

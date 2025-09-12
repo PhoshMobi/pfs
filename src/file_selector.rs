@@ -484,7 +484,8 @@ pub mod imp {
 
 glib::wrapper! {
     pub struct FileSelector(ObjectSubclass<imp::FileSelector>)
-        @extends adw::Window, gtk::Window, gtk::Widget;
+        @extends adw::Window, gtk::Window, gtk::Widget,
+        @implements gtk::Accessible, gtk::Buildable, gtk::ConstraintTarget, gtk::Native, gtk::Root, gtk::ShortcutManager;
 }
 
 impl Default for FileSelector {

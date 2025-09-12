@@ -359,7 +359,8 @@ mod imp {
 
 glib::wrapper! {
     pub struct DirView(ObjectSubclass<imp::DirView>)
-        @extends adw::Bin, gtk::Widget;
+        @extends adw::Bin, gtk::Widget,
+        @implements gtk::Accessible, gtk::Buildable, gtk::ConstraintTarget;
 }
 
 impl Default for DirView {
