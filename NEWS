@@ -1,3 +1,16 @@
+pfs 0.0.5
+---------
+September 2025
+* Allow to save files by pressing `<enter>`
+* Make settings schema optional
+* Make cargo installable
+* Move to gtk-rs 0.10
+* Issues fixed
+    * https://gitlab.gnome.org/guidog/pfs/-/issues/15
+* Contributors:
+    * Arun Mani J
+    * Guido Günther
+
 pfs 0.0.4
 ---------
 June 2025
