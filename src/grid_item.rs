@@ -124,4 +124,12 @@ impl GridItem {
     pub fn new() -> Self {
         Self::default()
     }
+
+    pub fn set_thumbnail(&self, path: String) {
+        let imp = self.imp();
+
+        if *imp.thumbnail_mode.borrow() != ThumbnailMode::Never {
+            imp.icon.get().set_from_file(Some(path));
+        }
+    }
 }

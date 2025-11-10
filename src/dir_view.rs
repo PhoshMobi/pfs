@@ -13,6 +13,7 @@ use glib_macros::{clone, Properties};
 use gtk::{gio, glib, CompositeTemplate};
 use std::cell::{Cell, RefCell};
 use std::cmp::Ordering;
+use std::collections::HashMap;
 use std::sync::OnceLock;
 
 use crate::{config::LOG_DOMAIN, file_selector::SortMode, grid_item::GridItem, util};
@@ -33,6 +34,15 @@ pub enum DisplayMode {
     Search,  // search results are displayed
     Loading, // folder content is loading
 }
+
+// Used to create thumbnails, optional, so any code using it should be fail-safe.
+const THUMBNAILER_NAME: &str = "mobi.phosh.Thumbnailer";
+const THUMBNAILER_PATH: &str = "/mobi/phosh/Thumbnailer";
+const THUMBNAILER_IFACE: &str = "mobi.phosh.Thumbnailer";
+
+// We will store the files without thumbnail in a map.
+// Once we get no more files for these seconds, then we will send them for thumbnailing.
+const THUMBNAILS_DEBOUNCE_SECS: u32 = 1;
 
 mod imp {
     use super::*;
@@ -112,6 +122,11 @@ mod imp {
         // Whether to show thumbnails
         #[property(get, set, builder(ThumbnailMode::default()))]
         pub thumbnail_mode: RefCell<ThumbnailMode>,
+
+        pub cancellable: RefCell<gio::Cancellable>,
+        pub debounce_id: RefCell<Option<glib::SourceId>>,
+        pub no_thumbnails: RefCell<HashMap<String, GridItem>>,
+        pub thumbnailer_proxy: RefCell<Option<gio::DBusProxy>>,
     }
 
     #[glib::object_subclass]
@@ -169,6 +184,8 @@ mod imp {
 
             let uri = folder.uri();
             glib::g_debug!(LOG_DOMAIN, "Loading folder for {uri:#?}");
+
+            self.no_thumbnails.borrow_mut().clear();
 
             *self.folder.borrow_mut() = Some(folder);
             obj.notify_folder();
@@ -318,6 +335,88 @@ mod imp {
             filter.emit_by_name::<()>("changed", &[&strict]);
             obj.notify_search_term();
         }
+
+        fn on_thumbnail_files_ready(
+            &self,
+            result: std::result::Result<glib::Variant, glib::Error>,
+        ) {
+            if result.is_ok() {
+                return;
+            }
+
+            let error = result.err().unwrap();
+            if let Some(dbus_error) = error.kind::<gio::DBusError>() {
+                if dbus_error != gio::DBusError::ServiceUnknown {
+                    glib::g_warning!(LOG_DOMAIN, "ThumbnailFiles failed: {error}");
+                }
+            }
+        }
+
+        pub fn send_for_thumbnailing(&self) {
+            let proxy = self.thumbnailer_proxy.borrow();
+            let Some(ref proxy) = *proxy else {
+                return;
+            };
+
+            let files: Vec<String> = self.no_thumbnails.borrow().keys().cloned().collect();
+            let options: HashMap<&str, glib::Variant> = HashMap::new();
+            let params = (files, options).to_variant();
+            proxy.call(
+                "ThumbnailFiles",
+                Some(&params),
+                gio::DBusCallFlags::NONE,
+                -1,
+                Some(&*self.cancellable.borrow()),
+                glib::clone!(
+                    #[weak(rename_to = this)]
+                    self,
+                    move |result: std::result::Result<glib::Variant, glib::Error>| this
+                        .on_thumbnail_files_ready(result)
+                ),
+            );
+        }
+
+        fn on_thumbnailing_done(&self, params: glib::Variant) {
+            let (thumbnails, _options) = <(
+                HashMap<String, glib::Variant>,
+                HashMap<String, glib::Variant>,
+            )>::from_variant(&params)
+            .unwrap_or_default();
+            let mut no_thumbnails = self.no_thumbnails.borrow_mut();
+
+            for (file_uri, value_var) in thumbnails.iter() {
+                if let Some(item) = no_thumbnails.remove(file_uri) {
+                    if let Some(path) = String::from_variant(value_var) {
+                        item.set_thumbnail(path);
+                    }
+                }
+            }
+        }
+
+        fn on_proxy_ready(&self, result: std::result::Result<gio::DBusProxy, glib::Error>) {
+            match result {
+                Ok(proxy) => {
+                    proxy.connect_closure(
+                        "g-signal::ThumbnailingDone",
+                        false,
+                        glib::closure_local!(
+                            #[weak(rename_to = this)]
+                            self,
+                            move |_: &gio::DBusProxy,
+                                  _: String,
+                                  _: String,
+                                  params: glib::Variant| this
+                                .on_thumbnailing_done(params)
+                        ),
+                    );
+                    *self.thumbnailer_proxy.borrow_mut() = Some(proxy);
+                }
+                Err(error) => {
+                    glib::g_message!(LOG_DOMAIN, "Failed to load thumbnailer: {error}");
+                    return;
+                }
+            }
+        }
     }
 
     #[glib::derived_properties]
@@ -325,6 +424,24 @@ mod imp {
         fn constructed(&self) {
             self.parent_constructed();
             let obj = self.obj();
+
+            *self.cancellable.borrow_mut() = gio::Cancellable::new();
+
+            gio::DBusProxy::for_bus(
+                gio::BusType::Session,
+                gio::DBusProxyFlags::NONE,
+                None,
+                THUMBNAILER_NAME,
+                THUMBNAILER_PATH,
+                THUMBNAILER_IFACE,
+                Some(&*self.cancellable.borrow()),
+                glib::clone!(
+                    #[weak(rename_to = this)]
+                    self,
+                    move |result: std::result::Result<gio::DBusProxy, glib::Error>| this
+                        .on_proxy_ready(result)
+                ),
+            );
 
             obj.setup_gsettings();
             obj.set_directories_first(true);
@@ -334,6 +451,10 @@ mod imp {
             obj.bind_property("folder", &self.directory_list.get(), "file")
                 .sync_create()
                 .build();
+        }
+
+        fn dispose(&self) {
+            self.cancellable.borrow().cancel();
         }
 
         fn signals() -> &'static [Signal] {
@@ -410,6 +531,34 @@ impl DirView {
         let grid_item = widget.downcast_ref::<GridItem>().unwrap();
 
         grid_item.set_fileinfo(info);
+
+        if info.boolean(gio::FILE_ATTRIBUTE_THUMBNAIL_IS_VALID) {
+            return;
+        }
+
+        let imp = self.imp();
+
+        if let Some(source_id) = imp.debounce_id.take() {
+            source_id.remove();
+        }
+
+        let mut no_thumbnails = imp.no_thumbnails.borrow_mut();
+        let binding = info.attribute_object("standard::file").unwrap();
+        let file = binding.downcast_ref::<gio::File>().unwrap();
+        no_thumbnails.insert(file.uri().to_string(), grid_item.clone());
+
+        let source_id = glib::source::timeout_add_seconds_local_once(
+            THUMBNAILS_DEBOUNCE_SECS,
+            glib::clone!(
+                #[weak(rename_to = this)]
+                imp,
+                move || {
+                    *this.debounce_id.borrow_mut() = None;
+                    this.send_for_thumbnailing();
+                }
+            ),
+        );
+        *imp.debounce_id.borrow_mut() = Some(source_id);
     }
 
     #[template_callback]
