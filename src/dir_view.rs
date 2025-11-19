@@ -648,10 +648,7 @@ impl DirView {
 
     #[template_callback]
     fn loading_to_status_page_spinner(&self) -> bool {
-        match self.display_mode() {
-            DisplayMode::Loading => true,
-            _ => false,
-        }
+        matches!(self.display_mode(), DisplayMode::Loading)
     }
 
     pub fn selected(&self) -> Option<Vec<String>> {
