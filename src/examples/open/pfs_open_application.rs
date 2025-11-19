@@ -47,6 +47,12 @@ mod imp {
             let home = glib::home_dir();
             application.open_directory(&gio::File::for_path(&home));
         }
+
+        fn open(&self, files: &[gio::File], _hint: &str) {
+            for file in files.iter() {
+                self.obj().open_directory(file);
+            }
+        }
     }
 
     impl GtkApplicationImpl for PfsOpenApplication {}
