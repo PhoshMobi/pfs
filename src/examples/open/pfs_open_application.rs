@@ -84,7 +84,7 @@ impl PfsOpenApplication {
         }
 
         let file_selector = glib::Object::builder::<FileSelector>()
-            .property("accept_label", "Done")
+            .property("accept_label", gettextrs::gettext("Open"))
             .property("title", "Select a File")
             .property("current-folder", file)
             .build();
