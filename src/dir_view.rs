@@ -622,8 +622,7 @@ impl DirView {
     fn searching_to_status_page_icon(&self) -> &str {
         match self.display_mode() {
             DisplayMode::Search => "nautilus-folder-search-symbolic",
-            DisplayMode::Content => "folder-symbolic",
-            DisplayMode::Loading => "folder-symbolic",
+            DisplayMode::Content | DisplayMode::Loading => "folder-symbolic",
         }
     }
 
