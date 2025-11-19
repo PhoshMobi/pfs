@@ -26,7 +26,7 @@ fn main() -> glib::ExitCode {
 
     pfs::init::init();
 
-    let app = PfsOpenApplication::new(&app_id);
+    let app = PfsOpenApplication::new(app_id);
     glib::set_prgname(Some(app_id));
     app.run()
 }
