@@ -414,7 +414,6 @@ mod imp {
                 }
                 Err(error) => {
                     glib::g_message!(LOG_DOMAIN, "Failed to load thumbnailer: {error}");
-                    return;
                 }
             }
         }
