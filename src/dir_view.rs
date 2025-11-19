@@ -681,13 +681,13 @@ impl DirView {
                 if self.imp().reversed.get() {
                     return gtk::Ordering::Larger;
                 }
-                return gtk::Ordering::Smaller;
+                gtk::Ordering::Smaller
             }
             Ordering::Greater => {
                 if self.imp().reversed.get() {
                     return gtk::Ordering::Smaller;
                 }
-                return gtk::Ordering::Larger;
+                gtk::Ordering::Larger
             }
             Ordering::Equal => gtk::Ordering::Equal,
         }
@@ -706,13 +706,13 @@ impl DirView {
                 if self.imp().reversed.get() {
                     return gtk::Ordering::Larger;
                 }
-                return gtk::Ordering::Smaller;
+                gtk::Ordering::Smaller
             }
             Ordering::Greater => {
                 if self.imp().reversed.get() {
                     return gtk::Ordering::Smaller;
                 }
-                return gtk::Ordering::Larger;
+                gtk::Ordering::Larger
             }
             Ordering::Equal => gtk::Ordering::Equal,
         }
