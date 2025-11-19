@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 The Phosh Developers
+ * Copyright 2024-2025 Phosh.mobi e.V.
  *
  * SPDX-License-Identifier: GPL-3.0-or-later
  *
@@ -94,7 +94,7 @@ impl PfsDemoApplication {
             .developers(vec!["Guido Günther"])
             // Translators: Replace "translator-credits" with your name/username, and optionally an email or URL.
             .translator_credits(&gettext("translator-credits"))
-            .copyright("© 2024 The Phosh Developers")
+            .copyright("© 2024-2025 Phosh.mobi e.V.")
             .build();
 
         about.present(Some(&window));
