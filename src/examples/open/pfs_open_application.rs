@@ -111,7 +111,9 @@ impl PfsOpenApplication {
                             .arg("open")
                             .arg(&uris[0])
                             .spawn()
-                            .expect("Failed to open {uris[0]:?}");
+                            .expect("Failed to open {uris[0]:?}")
+                            .wait()
+                            .expect("Failed to spawn gio");
                     }
 
                     if imp.hold_count.replace(imp.hold_count.get() - 1) == 1 {
