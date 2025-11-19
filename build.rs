@@ -23,7 +23,7 @@ fn build_resources() {
         for line in error.lines() {
             println!("cargo::error={line}");
         }
-        println!("cargo::error={}", "Failed to bundle resources",);
+        println!("cargo::error=Failed to bundle resources",);
         return;
     }
 
