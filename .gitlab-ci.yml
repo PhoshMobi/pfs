@@ -12,7 +12,7 @@ stages:
  - style-checks
  - package
 
-image: debian:trixie
+image: debian:forky
 
 default:
   # Protect CI infra from rogue jobs
