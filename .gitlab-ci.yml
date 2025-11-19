@@ -10,7 +10,7 @@ stages:
  - build
  - test+docs
  - style-checks
- - deploy
+ - package
 
 image: debian:trixie
 
@@ -116,3 +116,9 @@ check-meson:
   image: ${PHOSH_DOCKER_IMAGE}
   extends:
     - .phosh-check-meson
+
+package-deb-debian-forky:
+  stage: package
+  variables:
+    PHOSH_DOCKER_IMAGE: debian:forky
+  extends: .phosh-build-debian-package
