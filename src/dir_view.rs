@@ -320,7 +320,7 @@ mod imp {
                 }
             }
 
-            let mode = if new_term.is_some() && new_term.as_ref().unwrap().len() > 0 {
+            let mode = if new_term.is_some() && !new_term.as_ref().unwrap().is_empty() {
                 DisplayMode::Search
             } else {
                 DisplayMode::Content
