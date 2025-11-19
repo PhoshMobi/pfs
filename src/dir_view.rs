@@ -385,7 +385,7 @@ mod imp {
             .unwrap_or_default();
             let mut no_thumbnails = self.no_thumbnails.borrow_mut();
 
-            for (file_uri, value_var) in thumbnails.iter() {
+            for (file_uri, value_var) in &thumbnails {
                 if let Some(item) = no_thumbnails.remove(file_uri) {
                     if let Some(path) = String::from_variant(value_var) {
                         item.set_thumbnail(path);
