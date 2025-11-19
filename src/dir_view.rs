@@ -320,12 +320,11 @@ mod imp {
                 }
             }
 
-            let mode;
-            if new_term.is_some() && new_term.as_ref().unwrap().len() > 0 {
-                mode = DisplayMode::Search;
+            let mode = if new_term.is_some() && new_term.as_ref().unwrap().len() > 0 {
+                DisplayMode::Search
             } else {
-                mode = DisplayMode::Content;
-            }
+                DisplayMode::Content
+            };
             if self.display_mode.get() != mode {
                 self.display_mode.replace(mode);
                 obj.notify_display_mode();
@@ -640,13 +639,11 @@ impl DirView {
 
     #[template_callback]
     fn on_loading_changed(&self) {
-        let mode;
-
-        if self.imp().directory_list.is_loading() {
-            mode = DisplayMode::Loading;
+        let mode = if self.imp().directory_list.is_loading() {
+            DisplayMode::Loading
         } else {
-            mode = DisplayMode::Content;
-        }
+            DisplayMode::Content
+        };
         self.imp().display_mode.replace(mode);
         self.imp().obj().notify_display_mode();
     }
