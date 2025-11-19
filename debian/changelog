@@ -1,0 +1,5 @@
+pfs (0.0.5) experimental; urgency=medium
+
+  * Initial packaging.
+
+ -- Guido Günther <agx@sigxcpu.org>  Wed, 19 Nov 2025 11:48:22 +0100

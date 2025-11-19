@@ -3,3 +3,16 @@ po/messages.mo
 po/notexist
 po/pfs.pot
 target/
+debian/.debhelper/
+debian/debhelper-build-stamp
+debian/files
+debian/pfs-common/
+debian/pfs-common.debhelper.log
+debian/pfs-common.substvars
+debian/pfs-demo/
+debian/pfs-demo.debhelper.log
+debian/pfs-demo.substvars
+debian/pfs-utils/
+debian/pfs-utils.debhelper.log
+debian/pfs-utils.substvars
+debian/tmp/
