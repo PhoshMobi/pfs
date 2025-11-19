@@ -207,9 +207,10 @@ mod imp {
 
             // Refilter
             let filter = self.filtered_list.filter().unwrap();
-            let strict = match show_hidden {
-                true => gtk::FilterChange::LessStrict,
-                false => gtk::FilterChange::MoreStrict,
+            let strict = if show_hidden {
+                gtk::FilterChange::LessStrict
+            } else {
+                gtk::FilterChange::MoreStrict
             };
             filter.emit_by_name::<()>("changed", &[&strict]);
         }
@@ -245,9 +246,10 @@ mod imp {
 
             // Refilter
             let filter = self.filtered_list.filter().unwrap();
-            let strict = match directories_only {
-                false => gtk::FilterChange::LessStrict,
-                true => gtk::FilterChange::MoreStrict,
+            let strict = if directories_only {
+                gtk::FilterChange::MoreStrict
+            } else {
+                gtk::FilterChange::LessStrict
             };
             filter.emit_by_name::<()>("changed", &[&strict]);
 
