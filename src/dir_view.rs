@@ -301,6 +301,7 @@ mod imp {
                     return;
                 }
 
+                #[allow(clippy::unnecessary_unwrap)]
                 if old_term.is_none() || new_term.is_none() {
                     strict = gtk::FilterChange::Different;
                 } else if old_term
