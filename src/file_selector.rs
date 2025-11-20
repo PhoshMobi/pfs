@@ -231,8 +231,7 @@ pub mod imp {
             }
 
             let directories_only = match mode {
-                FileSelectorMode::OpenFile => false,
-                FileSelectorMode::SaveFile => false,
+                FileSelectorMode::OpenFile | FileSelectorMode::SaveFile => false,
                 FileSelectorMode::SaveFiles => true,
             };
             obj.set_directory(directories_only);
@@ -462,9 +461,8 @@ pub mod imp {
         #[template_callback]
         fn mode_to_filename_entry(&self, mode: FileSelectorMode) -> bool {
             match mode {
-                FileSelectorMode::OpenFile => false,
+                FileSelectorMode::OpenFile | FileSelectorMode::SaveFiles => false,
                 FileSelectorMode::SaveFile => true,
-                FileSelectorMode::SaveFiles => false,
             }
         }
 
