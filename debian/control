@@ -4,7 +4,7 @@ Priority: optional
 Maintainer: Guido Günther <agx@sigxcpu.org>
 Build-Depends:
  debhelper-compat (= 13),
- cargo,
+ cargo <!pkg.pfs.rustup>,
  desktop-file-utils,
  gsettings-desktop-schemas-dev (>= 47),
  libadwaita-1-dev (>= 1.6),
@@ -12,7 +12,8 @@ Build-Depends:
  libgtk-4-dev (>= 4.12),
  meson,
  patchelf,
- rustc (>= 1.86),
+ rustc (>= 1.86) <!pkg.pfs.rustup>,
+ rustup <pkg.pfs.rustup>,
 Standards-Version: 4.6.2
 
 Package: pfs-utils

@@ -42,7 +42,7 @@ variables:
   RUST_VERSION: stable
   GIT_SUBMODULE_STRATEGY: recursive
   DEBIAN_IMAGE: $CI_REGISTRY/world/phosh/pfs/debian:v0.0.2025-11-20.1
-
+  DEB_BUILD_PROFILES: pkg.pfs.rustup
 
 .common_before_script: &common_before_script
   before_script:
@@ -139,4 +139,5 @@ package-deb-debian-forky:
   stage: package
   variables:
     PHOSH_DOCKER_IMAGE: debian:forky
+    DEB_BUILD_PROFILES:
   extends: .phosh-build-debian-package
