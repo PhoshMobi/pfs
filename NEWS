@@ -6,7 +6,7 @@ September 2025
 * Make cargo installable
 * Move to gtk-rs 0.10
 * Issues fixed
-    * https://gitlab.gnome.org/guidog/pfs/-/issues/15
+    * https://gitlab.gnome.org/World/Phosh/pfs/-/issues/15
 * Contributors:
     * Arun Mani J
     * Guido Günther
@@ -16,7 +16,7 @@ pfs 0.0.4
 June 2025
 * Fix initial empty state
 * Issues fixed
-    * https://gitlab.gnome.org/guidog/pfs/-/issues/13
+    * https://gitlab.gnome.org/World/Phosh/pfs/-/issues/13
 * Contributors:
     * Guido Günther
 

@@ -39,7 +39,7 @@ workflow:
 
 variables:
   # For ci-fairy
-  FDO_UPSTREAM_REPO: guidog/pfs
+  FDO_UPSTREAM_REPO: World/Phosh/pfs
   RUST_BACKTRACE: "full"
   RUST_VERSION: stable
   DEPS: |
