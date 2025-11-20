@@ -10,9 +10,9 @@ stages:
  - build
  - test+docs
  - style-checks
- - deploy
+ - package
 
-image: debian:trixie
+image: debian:forky
 
 default:
   # Protect CI infra from rogue jobs
@@ -116,3 +116,9 @@ check-meson:
   image: ${PHOSH_DOCKER_IMAGE}
   extends:
     - .phosh-check-meson
+
+package-deb-debian-forky:
+  stage: package
+  variables:
+    PHOSH_DOCKER_IMAGE: debian:forky
+  extends: .phosh-build-debian-package
