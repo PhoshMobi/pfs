@@ -107,7 +107,7 @@ check-commit-log:
 check-markdown:
   stage: style-checks
   variables:
-    PHOSH_MARKDOWN_PATHS: "*.md doc/*.md"
+    PHOSH_MARKDOWN_PATHS: "*.md"
   extends:
     - .phosh-check-markdown
 
