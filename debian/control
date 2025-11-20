@@ -11,6 +11,7 @@ Build-Depends:
  libglib2.0-dev (>= 2.74),
  libgtk-4-dev (>= 4.12),
  meson,
+ patchelf,
  rustc (>= 1.86),
 Standards-Version: 4.6.2
 
