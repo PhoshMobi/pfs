@@ -659,7 +659,7 @@ impl DirView {
             }
         } else {
             let selected = self.imp().single_selection.get().selected_item();
-            let Some(item) = selected else { return None };
+            let item = selected?;
 
             let file = item
                 .downcast_ref::<gio::FileInfo>()

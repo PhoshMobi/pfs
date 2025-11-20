@@ -324,9 +324,7 @@ pub mod imp {
         }
 
         fn get_selected_choices(&self) -> Option<glib::Variant> {
-            let Some(action_group) = self.choices_actions.borrow().clone() else {
-                return None;
-            };
+            let action_group = self.choices_actions.borrow().clone()?;
             let action_names = action_group.list_actions();
             let mut ret: Vec<(String, String)> = Vec::new();
 
@@ -425,10 +423,7 @@ pub mod imp {
 
         #[template_callback]
         fn filters_to_menu_model(&self) -> Option<gio::MenuModel> {
-            let Some(filters) = self.obj().filters() else {
-                return None;
-            };
-
+            let filters = self.obj().filters()?;
             let menu = gio::Menu::new();
             let mut pos = 0;
             for item in &filters {
