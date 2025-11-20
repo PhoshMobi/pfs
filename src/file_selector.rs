@@ -679,11 +679,13 @@ pub extern "C" fn pfs_file_selector_get_type() -> GType {
     <FileSelector as StaticType>::static_type().into_glib()
 }
 
+#[allow(clippy::missing_safety_doc)]
 #[no_mangle]
 pub unsafe extern "C" fn pfs_file_selector_new() -> *mut PfsFileSelector {
     FileSelector::new().into_glib_ptr()
 }
 
+#[allow(clippy::missing_safety_doc)]
 #[no_mangle]
 pub unsafe extern "C" fn pfs_file_selector_set_current_directory(
     fs: *mut PfsFileSelector,
@@ -695,6 +697,7 @@ pub unsafe extern "C" fn pfs_file_selector_set_current_directory(
     obj.set_current_directory(dir.to_string());
 }
 
+#[allow(clippy::missing_safety_doc)]
 #[no_mangle]
 pub unsafe extern "C" fn pfs_file_selector_set_accept_label(
     fs: *mut PfsFileSelector,
@@ -706,6 +709,7 @@ pub unsafe extern "C" fn pfs_file_selector_set_accept_label(
     obj.set_accept_label(label.to_string());
 }
 
+#[allow(clippy::missing_safety_doc)]
 #[no_mangle]
 pub unsafe extern "C" fn pfs_file_selector_get_selected(
     fs: *mut PfsFileSelector,
@@ -716,6 +720,7 @@ pub unsafe extern "C" fn pfs_file_selector_get_selected(
     strv.into_raw()
 }
 
+#[allow(clippy::missing_safety_doc)]
 #[no_mangle]
 pub unsafe extern "C" fn pfs_file_selector_set_mode(fs: *mut PfsFileSelector, mode: i32) {
     let mode = FileSelectorMode::from_glib(mode);
@@ -724,6 +729,7 @@ pub unsafe extern "C" fn pfs_file_selector_set_mode(fs: *mut PfsFileSelector, mo
     obj.set_mode(mode);
 }
 
+#[allow(clippy::missing_safety_doc)]
 #[no_mangle]
 pub unsafe extern "C" fn pfs_file_selector_set_filename(
     fs: *mut PfsFileSelector,

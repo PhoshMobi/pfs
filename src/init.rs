@@ -50,6 +50,7 @@ pub fn init() {
 
 // C bindings:
 
+#[allow(clippy::missing_safety_doc)]
 #[no_mangle]
 pub unsafe extern "C" fn pfs_init() {
     init()
