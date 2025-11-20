@@ -48,7 +48,7 @@ pub fn init() {
     INITIALIZED.store(true, Ordering::Release);
 }
 
-/// C bindings:
+// C bindings:
 
 #[no_mangle]
 pub unsafe extern "C" fn pfs_init() {

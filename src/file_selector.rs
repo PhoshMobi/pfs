@@ -669,7 +669,7 @@ impl FileSelector {
     }
 }
 
-/// C bindings:
+// C bindings:
 
 pub type PfsFileSelector = <imp::FileSelector as ObjectSubclass>::Instance;
 
