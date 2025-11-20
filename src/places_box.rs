@@ -73,7 +73,7 @@ mod imp {
             self.flow_box.append(&item);
 
             let home = gio::File::for_path(glib::home_dir());
-            for (dir, icon) in util::SPECIAL_DIRS.iter() {
+            for (dir, icon) in &util::SPECIAL_DIRS {
                 let Some(path) = glib::user_special_dir(*dir) else {
                     continue;
                 };
