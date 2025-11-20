@@ -291,8 +291,8 @@ mod imp {
             let mut new_term: Option<String> = None;
 
             {
-                if search_term.is_some() {
-                    new_term = Some(search_term.as_ref().unwrap().trim().to_lowercase());
+                if let Some(term) = &search_term {
+                    new_term = Some(term.trim().to_lowercase());
                 }
 
                 // old_term only borrowed in this block
@@ -569,8 +569,7 @@ impl DirView {
         let selected_item = selection.selected_item();
         let mut is_selected = false;
 
-        if selected_item.is_some() {
-            let info = selected_item.unwrap();
+        if let Some(info) = selected_item {
             let fileinfo = info.downcast_ref::<gio::FileInfo>().unwrap();
             let object = fileinfo.attribute_object("standard::file").unwrap();
             let file = object.downcast_ref::<gio::File>().unwrap();
