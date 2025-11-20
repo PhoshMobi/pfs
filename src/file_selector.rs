@@ -354,7 +354,7 @@ pub mod imp {
                 let file = gio::File::for_uri(first);
 
                 if file.query_exists(None::<&gio::Cancellable>) {
-                    self.obj().confirm_overwrite(file);
+                    self.obj().confirm_overwrite(&file);
                     return;
                 }
             }
@@ -609,7 +609,7 @@ impl FileSelector {
             .build();
     }
 
-    fn confirm_overwrite(&self, file: gio::File) {
+    fn confirm_overwrite(&self, file: &gio::File) {
         let basename = file.basename().unwrap();
         let dirname = file.parent().unwrap().path().unwrap();
         let body = gettextrs::gettext("Overwrite existing file {} in {}?")
