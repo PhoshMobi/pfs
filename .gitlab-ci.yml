@@ -79,7 +79,7 @@ check-consistency:
   stage: test+docs
   extends: .phosh-check-consistency
 
-cargo-fmt:
+check-fmt:
   stage: style-checks
   needs: []
   image: rust
