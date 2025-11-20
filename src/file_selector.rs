@@ -200,10 +200,12 @@ pub mod imp {
             let filters = obj.filters();
             let mut filter: Option<gtk::FileFilter> = None;
 
-            if pos != gtk::INVALID_LIST_POSITION && filters.is_some() {
-                filter = match filters.unwrap().item(pos) {
-                    Some(object) => object.downcast_ref::<gtk::FileFilter>().cloned(),
-                    None => None,
+            if pos != gtk::INVALID_LIST_POSITION {
+                if let Some(value) = filters {
+                    filter = match value.item(pos) {
+                        Some(object) => object.downcast_ref::<gtk::FileFilter>().cloned(),
+                        None => None,
+                    }
                 }
             }
 
