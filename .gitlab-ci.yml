@@ -45,7 +45,7 @@ variables:
   DEPS: |
     git build-essential ca-certificates meson curl rustup
     meson libgtk-4-dev libadwaita-1-dev libglib2.0-dev gettext
-    patchelf desktop-file-utils
+    patchelf desktop-file-utils xauth xvfb
   GIT_SUBMODULE_STRATEGY: recursive
 
 .common_before_script: &common_before_script
@@ -73,6 +73,13 @@ build-lib:
     - meson setup -Dexamples=false -Dshared-lib=false _build
     - meson install -C _build
     - meson test -C _build
+
+test:
+  stage: test+docs
+  needs: [build]
+  <<: *common_before_script
+  script:
+    - CARGO_HOME=_build/cargo PFS_RESOURCE_DIR=$PWD/_build/src xvfb-run cargo test
 
 check-po:
   stage: test+docs
