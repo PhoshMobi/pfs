@@ -299,7 +299,7 @@ pub mod imp {
                         let (option_id, option_label) = choice_tuple;
                         let item = gio::MenuItem::new(
                             Some(&option_label),
-                            Some(&format!("custom-choices.{}::{}", choice_id, option_id)),
+                            Some(&format!("custom-choices.{choice_id}::{option_id}")),
                         );
 
                         submenu.append_item(&item);
@@ -314,7 +314,7 @@ pub mod imp {
                         &(selected == "true").to_variant(),
                     );
                     actions.add_action(&action);
-                    menu.append(Some(&label), Some(&format!("custom-choices.{}", choice_id)));
+                    menu.append(Some(&label), Some(&format!("custom-choices.{choice_id}")));
                 }
             }
 
@@ -431,7 +431,7 @@ pub mod imp {
                     continue;
                 };
                 let name = filter.name().unwrap_or("Unknown filter".into());
-                let action = format!("file-selector.set-filter::{}", pos);
+                let action = format!("file-selector.set-filter::{pos}");
                 menu.insert(pos, Some(&name), Some(&action));
                 pos += 1;
             }
