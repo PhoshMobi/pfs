@@ -207,9 +207,10 @@ mod imp {
 
             // Refilter
             let filter = self.filtered_list.filter().unwrap();
-            let strict = match show_hidden {
-                true => gtk::FilterChange::LessStrict,
-                false => gtk::FilterChange::MoreStrict,
+            let strict = if show_hidden {
+                gtk::FilterChange::LessStrict
+            } else {
+                gtk::FilterChange::MoreStrict
             };
             filter.emit_by_name::<()>("changed", &[&strict]);
         }
@@ -245,9 +246,10 @@ mod imp {
 
             // Refilter
             let filter = self.filtered_list.filter().unwrap();
-            let strict = match directories_only {
-                false => gtk::FilterChange::LessStrict,
-                true => gtk::FilterChange::MoreStrict,
+            let strict = if directories_only {
+                gtk::FilterChange::MoreStrict
+            } else {
+                gtk::FilterChange::LessStrict
             };
             filter.emit_by_name::<()>("changed", &[&strict]);
 
@@ -318,12 +320,11 @@ mod imp {
                 }
             }
 
-            let mode;
-            if new_term.is_some() && new_term.as_ref().unwrap().len() > 0 {
-                mode = DisplayMode::Search;
+            let mode = if new_term.is_some() && !new_term.as_ref().unwrap().is_empty() {
+                DisplayMode::Search
             } else {
-                mode = DisplayMode::Content;
-            }
+                DisplayMode::Content
+            };
             if self.display_mode.get() != mode {
                 self.display_mode.replace(mode);
                 obj.notify_display_mode();
@@ -384,7 +385,7 @@ mod imp {
             .unwrap_or_default();
             let mut no_thumbnails = self.no_thumbnails.borrow_mut();
 
-            for (file_uri, value_var) in thumbnails.iter() {
+            for (file_uri, value_var) in &thumbnails {
                 if let Some(item) = no_thumbnails.remove(file_uri) {
                     if let Some(path) = String::from_variant(value_var) {
                         item.set_thumbnail(path);
@@ -413,7 +414,6 @@ mod imp {
                 }
                 Err(error) => {
                     glib::g_message!(LOG_DOMAIN, "Failed to load thumbnailer: {error}");
-                    return;
                 }
             }
         }
@@ -622,8 +622,7 @@ impl DirView {
     fn searching_to_status_page_icon(&self) -> &str {
         match self.display_mode() {
             DisplayMode::Search => "nautilus-folder-search-symbolic",
-            DisplayMode::Content => "folder-symbolic",
-            DisplayMode::Loading => "folder-symbolic",
+            DisplayMode::Content | DisplayMode::Loading => "folder-symbolic",
         }
     }
 
@@ -638,23 +637,18 @@ impl DirView {
 
     #[template_callback]
     fn on_loading_changed(&self) {
-        let mode;
-
-        if self.imp().directory_list.is_loading() {
-            mode = DisplayMode::Loading;
+        let mode = if self.imp().directory_list.is_loading() {
+            DisplayMode::Loading
         } else {
-            mode = DisplayMode::Content;
-        }
+            DisplayMode::Content
+        };
         self.imp().display_mode.replace(mode);
         self.imp().obj().notify_display_mode();
     }
 
     #[template_callback]
     fn loading_to_status_page_spinner(&self) -> bool {
-        match self.display_mode() {
-            DisplayMode::Loading => true,
-            _ => false,
-        }
+        matches!(self.display_mode(), DisplayMode::Loading)
     }
 
     pub fn selected(&self) -> Option<Vec<String>> {
@@ -665,10 +659,7 @@ impl DirView {
             }
         } else {
             let selected = self.imp().single_selection.get().selected_item();
-            let item = match selected {
-                None => return None,
-                Some(item) => item,
-            };
+            let Some(item) = selected else { return None };
 
             let file = item
                 .downcast_ref::<gio::FileInfo>()
@@ -689,16 +680,14 @@ impl DirView {
             Ordering::Less => {
                 if self.imp().reversed.get() {
                     return gtk::Ordering::Larger;
-                } else {
-                    return gtk::Ordering::Smaller;
                 }
+                gtk::Ordering::Smaller
             }
             Ordering::Greater => {
                 if self.imp().reversed.get() {
                     return gtk::Ordering::Smaller;
-                } else {
-                    return gtk::Ordering::Larger;
                 }
+                gtk::Ordering::Larger
             }
             Ordering::Equal => gtk::Ordering::Equal,
         }
@@ -716,16 +705,14 @@ impl DirView {
             Ordering::Less => {
                 if self.imp().reversed.get() {
                     return gtk::Ordering::Larger;
-                } else {
-                    return gtk::Ordering::Smaller;
                 }
+                gtk::Ordering::Smaller
             }
             Ordering::Greater => {
                 if self.imp().reversed.get() {
                     return gtk::Ordering::Smaller;
-                } else {
-                    return gtk::Ordering::Larger;
                 }
+                gtk::Ordering::Larger
             }
             Ordering::Equal => gtk::Ordering::Equal,
         }

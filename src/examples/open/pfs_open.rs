@@ -13,8 +13,8 @@ use self::pfs_open_application::PfsOpenApplication;
 
 use config::{GETTEXT_PACKAGE, LOCALEDIR};
 use gettextrs::{bind_textdomain_codeset, bindtextdomain, textdomain};
+use gtk::glib;
 use gtk::prelude::*;
-use gtk::{gio, glib};
 
 fn main() -> glib::ExitCode {
     let app_id = "mobi.phosh.FileOpen";
@@ -26,7 +26,7 @@ fn main() -> glib::ExitCode {
 
     pfs::init::init();
 
-    let app = PfsOpenApplication::new(&app_id, &gio::ApplicationFlags::empty());
+    let app = PfsOpenApplication::new(app_id);
     glib::set_prgname(Some(app_id));
     app.run()
 }

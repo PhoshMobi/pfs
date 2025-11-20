@@ -69,12 +69,12 @@ mod imp {
                         have_thumbnail = true;
                     }
                 }
-            };
+            }
 
             if !have_thumbnail {
                 if let Some(icon) = info.icon() {
-                    self.icon.get().set_from_gicon(&icon)
-                };
+                    self.icon.get().set_from_gicon(&icon);
+                }
             }
         }
 
