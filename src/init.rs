@@ -36,7 +36,7 @@ pub fn init() {
 
     let provider = gtk::CssProvider::new();
     provider.load_from_file(&gio::File::for_uri(
-        &"resource:///mobi/phosh/FileSelector/style.css",
+        "resource:///mobi/phosh/FileSelector/style.css",
     ));
 
     gtk::style_context_add_provider_for_display(

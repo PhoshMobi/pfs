@@ -61,7 +61,7 @@ pub fn folder_to_icon_name(file: gio::File) -> &'static str {
         _ => {}
     }
 
-    let home = gio::File::for_path(&glib::home_dir());
+    let home = gio::File::for_path(glib::home_dir());
     if home.equal(&file) {
         return "user-home-symbolic";
     }

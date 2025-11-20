@@ -58,21 +58,21 @@ mod imp {
             self.parent_constructed();
 
             let item = Object::builder::<PlacesItem>()
-                .property("place", &gettextrs::gettext("Recent"))
+                .property("place", gettextrs::gettext("Recent"))
                 .property("icon-name", "document-open-recent-symbolic")
                 .property("uri", "recent:///")
                 .build();
             self.flow_box.append(&item);
 
-            let home = gio::File::for_path(&glib::home_dir());
+            let home = gio::File::for_path(glib::home_dir());
             let item = Object::builder::<PlacesItem>()
-                .property("place", &gettextrs::gettext("Home"))
+                .property("place", gettextrs::gettext("Home"))
                 .property("icon-name", "user-home-symbolic")
                 .property("uri", home.uri())
                 .build();
             self.flow_box.append(&item);
 
-            let home = gio::File::for_path(&glib::home_dir());
+            let home = gio::File::for_path(glib::home_dir());
             for (dir, icon) in util::SPECIAL_DIRS.iter() {
                 let Some(path) = glib::user_special_dir(*dir) else {
                     continue;
@@ -93,7 +93,7 @@ mod imp {
             }
 
             let item = Object::builder::<PlacesItem>()
-                .property("place", &gettextrs::gettext("Trash"))
+                .property("place", gettextrs::gettext("Trash"))
                 .property("icon-name", "user-trash-symbolic")
                 .property("uri", "trash:///")
                 .build();

@@ -285,7 +285,7 @@ pub mod imp {
 
                     let action = gio::SimpleAction::new_stateful(
                         &choice_id,
-                        Some(&"".to_variant().type_()),
+                        Some("".to_variant().type_()),
                         &"".to_variant(),
                     );
                     actions.add_action(&action);
@@ -624,7 +624,7 @@ impl FileSelector {
             .replacen("{}", dirname.to_str().unwrap(), 1);
 
         let dialog = adw::AlertDialog::builder()
-            .title(&gettextrs::gettext("Replace existing file?"))
+            .title(gettextrs::gettext("Replace existing file?"))
             .body(&body)
             .close_response("cancel")
             .default_response("cancel")

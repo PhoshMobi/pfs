@@ -747,8 +747,8 @@ impl DirView {
 
                 let mode = *this.imp().sort_mode.borrow();
                 match mode {
-                    SortMode::DisplayName => this.sort_by_name(&info1, &info2),
-                    SortMode::ModificationTime => this.sort_by_modification_time(&info1, &info2),
+                    SortMode::DisplayName => this.sort_by_name(info1, info2),
+                    SortMode::ModificationTime => this.sort_by_modification_time(info1, info2),
                 }
             }
         ));
