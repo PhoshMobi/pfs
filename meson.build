@@ -6,6 +6,9 @@ project(
   default_options: ['warning_level=2', 'werror=false'],
 )
 
+prefix = get_option('prefix')
+datadir = prefix / get_option('datadir')
+
 i18n = import('i18n')
 gnome = import('gnome')
 pkgconfig = import('pkgconfig')
