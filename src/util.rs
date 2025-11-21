@@ -61,12 +61,12 @@ pub fn folder_to_icon_name(file: gio::File) -> &'static str {
         _ => {}
     }
 
-    let home = gio::File::for_path(&glib::home_dir());
+    let home = gio::File::for_path(glib::home_dir());
     if home.equal(&file) {
         return "user-home-symbolic";
     }
 
-    for (dir, icon) in SPECIAL_DIRS.iter() {
+    for (dir, icon) in &SPECIAL_DIRS {
         let Some(dir) = glib::user_special_dir(*dir) else {
             continue;
         };

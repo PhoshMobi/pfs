@@ -200,10 +200,12 @@ pub mod imp {
             let filters = obj.filters();
             let mut filter: Option<gtk::FileFilter> = None;
 
-            if pos != gtk::INVALID_LIST_POSITION && filters.is_some() {
-                filter = match filters.unwrap().item(pos) {
-                    Some(object) => object.downcast_ref::<gtk::FileFilter>().cloned(),
-                    None => None,
+            if pos != gtk::INVALID_LIST_POSITION {
+                if let Some(value) = filters {
+                    filter = match value.item(pos) {
+                        Some(object) => object.downcast_ref::<gtk::FileFilter>().cloned(),
+                        None => None,
+                    }
                 }
             }
 
@@ -231,8 +233,7 @@ pub mod imp {
             }
 
             let directories_only = match mode {
-                FileSelectorMode::OpenFile => false,
-                FileSelectorMode::SaveFile => false,
+                FileSelectorMode::OpenFile | FileSelectorMode::SaveFile => false,
                 FileSelectorMode::SaveFiles => true,
             };
             obj.set_directory(directories_only);
@@ -285,7 +286,7 @@ pub mod imp {
 
                     let action = gio::SimpleAction::new_stateful(
                         &choice_id,
-                        Some(&"".to_variant().type_()),
+                        Some("".to_variant().type_()),
                         &"".to_variant(),
                     );
                     actions.add_action(&action);
@@ -300,7 +301,7 @@ pub mod imp {
                         let (option_id, option_label) = choice_tuple;
                         let item = gio::MenuItem::new(
                             Some(&option_label),
-                            Some(&format!("custom-choices.{}::{}", choice_id, option_id)),
+                            Some(&format!("custom-choices.{choice_id}::{option_id}")),
                         );
 
                         submenu.append_item(&item);
@@ -315,7 +316,7 @@ pub mod imp {
                         &(selected == "true").to_variant(),
                     );
                     actions.add_action(&action);
-                    menu.append(Some(&label), Some(&format!("custom-choices.{}", choice_id)));
+                    menu.append(Some(&label), Some(&format!("custom-choices.{choice_id}")));
                 }
             }
 
@@ -324,9 +325,7 @@ pub mod imp {
         }
 
         fn get_selected_choices(&self) -> Option<glib::Variant> {
-            let Some(action_group) = self.choices_actions.borrow().clone() else {
-                return None;
-            };
+            let action_group = self.choices_actions.borrow().clone()?;
             let action_names = action_group.list_actions();
             let mut ret: Vec<(String, String)> = Vec::new();
 
@@ -357,7 +356,7 @@ pub mod imp {
                 let file = gio::File::for_uri(first);
 
                 if file.query_exists(None::<&gio::Cancellable>) {
-                    self.obj().confirm_overwrite(file);
+                    self.obj().confirm_overwrite(&file);
                     return;
                 }
             }
@@ -425,10 +424,7 @@ pub mod imp {
 
         #[template_callback]
         fn filters_to_menu_model(&self) -> Option<gio::MenuModel> {
-            let Some(filters) = self.obj().filters() else {
-                return None;
-            };
-
+            let filters = self.obj().filters()?;
             let menu = gio::Menu::new();
             let mut pos = 0;
             for item in &filters {
@@ -437,7 +433,7 @@ pub mod imp {
                     continue;
                 };
                 let name = filter.name().unwrap_or("Unknown filter".into());
-                let action = format!("file-selector.set-filter::{}", pos);
+                let action = format!("file-selector.set-filter::{pos}");
                 menu.insert(pos, Some(&name), Some(&action));
                 pos += 1;
             }
@@ -467,9 +463,8 @@ pub mod imp {
         #[template_callback]
         fn mode_to_filename_entry(&self, mode: FileSelectorMode) -> bool {
             match mode {
-                FileSelectorMode::OpenFile => false,
+                FileSelectorMode::OpenFile | FileSelectorMode::SaveFiles => false,
                 FileSelectorMode::SaveFile => true,
-                FileSelectorMode::SaveFiles => false,
             }
         }
 
@@ -616,7 +611,7 @@ impl FileSelector {
             .build();
     }
 
-    fn confirm_overwrite(&self, file: gio::File) {
+    fn confirm_overwrite(&self, file: &gio::File) {
         let basename = file.basename().unwrap();
         let dirname = file.parent().unwrap().path().unwrap();
         let body = gettextrs::gettext("Overwrite existing file {} in {}?")
@@ -624,7 +619,7 @@ impl FileSelector {
             .replacen("{}", dirname.to_str().unwrap(), 1);
 
         let dialog = adw::AlertDialog::builder()
-            .title(&gettextrs::gettext("Replace existing file?"))
+            .title(gettextrs::gettext("Replace existing file?"))
             .body(&body)
             .close_response("cancel")
             .default_response("cancel")
@@ -669,7 +664,7 @@ impl FileSelector {
     }
 }
 
-/// C bindings:
+// C bindings:
 
 pub type PfsFileSelector = <imp::FileSelector as ObjectSubclass>::Instance;
 
@@ -679,11 +674,13 @@ pub extern "C" fn pfs_file_selector_get_type() -> GType {
     <FileSelector as StaticType>::static_type().into_glib()
 }
 
+#[allow(clippy::missing_safety_doc)]
 #[no_mangle]
 pub unsafe extern "C" fn pfs_file_selector_new() -> *mut PfsFileSelector {
     FileSelector::new().into_glib_ptr()
 }
 
+#[allow(clippy::missing_safety_doc)]
 #[no_mangle]
 pub unsafe extern "C" fn pfs_file_selector_set_current_directory(
     fs: *mut PfsFileSelector,
@@ -695,6 +692,7 @@ pub unsafe extern "C" fn pfs_file_selector_set_current_directory(
     obj.set_current_directory(dir.to_string());
 }
 
+#[allow(clippy::missing_safety_doc)]
 #[no_mangle]
 pub unsafe extern "C" fn pfs_file_selector_set_accept_label(
     fs: *mut PfsFileSelector,
@@ -706,6 +704,7 @@ pub unsafe extern "C" fn pfs_file_selector_set_accept_label(
     obj.set_accept_label(label.to_string());
 }
 
+#[allow(clippy::missing_safety_doc)]
 #[no_mangle]
 pub unsafe extern "C" fn pfs_file_selector_get_selected(
     fs: *mut PfsFileSelector,
@@ -716,6 +715,7 @@ pub unsafe extern "C" fn pfs_file_selector_get_selected(
     strv.into_raw()
 }
 
+#[allow(clippy::missing_safety_doc)]
 #[no_mangle]
 pub unsafe extern "C" fn pfs_file_selector_set_mode(fs: *mut PfsFileSelector, mode: i32) {
     let mode = FileSelectorMode::from_glib(mode);
@@ -724,6 +724,7 @@ pub unsafe extern "C" fn pfs_file_selector_set_mode(fs: *mut PfsFileSelector, mo
     obj.set_mode(mode);
 }
 
+#[allow(clippy::missing_safety_doc)]
 #[no_mangle]
 pub unsafe extern "C" fn pfs_file_selector_set_filename(
     fs: *mut PfsFileSelector,

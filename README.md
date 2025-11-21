@@ -26,4 +26,4 @@ G_MESSAGES_DEBUG=pfs ./_build/run _build/src/examples/pfs-c-demo
 ## Getting in Touch
 
 * Issue tracker: <https://gitlab.gnome.org/guidog/pfs/issues>
-* Matrix: <https://matrix.to/#/#phosh:sigxcpu.org>
+* Matrix: <https://matrix.to/#/#phosh:phosh.mobi>

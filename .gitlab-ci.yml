@@ -1,5 +1,5 @@
 include:
- - project: 'guidog/meta-phosh'
+ - project: 'World/Phosh/meta-phosh'
    ref: '3629f479a3b1d37077137f05f988028c6e712378'
    file: '/ci/phosh-common-jobs.yml'
  - project: 'Infrastructure/freedesktop-ci-templates'
@@ -62,6 +62,9 @@ build:
     - meson setup -Dexamples=true -Dshared-lib=true _build
     - meson install -C _build
     - meson test -C _build
+  artifacts:
+    paths:
+      - _build
 
 build-lib:
   stage: build
@@ -79,7 +82,7 @@ check-consistency:
   stage: test+docs
   extends: .phosh-check-consistency
 
-cargo-fmt:
+check-fmt:
   stage: style-checks
   needs: []
   image: rust
@@ -107,7 +110,7 @@ check-commit-log:
 check-markdown:
   stage: style-checks
   variables:
-    PHOSH_MARKDOWN_PATHS: "*.md doc/*.md"
+    PHOSH_MARKDOWN_PATHS: "*.md"
   extends:
     - .phosh-check-markdown
 
@@ -116,6 +119,15 @@ check-meson:
   image: ${PHOSH_DOCKER_IMAGE}
   extends:
     - .phosh-check-meson
+
+check-clippy:
+  stage: style-checks
+  needs: [build]
+  <<: *common_before_script
+  script:
+    - eatmydata apt-get install -y rust-clippy
+    # TODO: add -- -Dclippy::pedantic
+    - CARGO_HOME=_build/cargo PFS_RESOURCE_DIR=$PWD/_build/src cargo clippy --no-deps -- -Dwarnings
 
 package-deb-debian-forky:
   stage: package
