@@ -6,6 +6,7 @@
  * Author: Guido Günther <agx@sigxcpu.org>
  */
 
+pub mod file_props;
 pub mod file_selector;
 pub mod init;
 

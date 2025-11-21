@@ -1,0 +1,202 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<interface>
+  <requires lib="gtk" version="4.0"/>
+  <requires lib="libadwaita" version="1.0"/>
+  <template class="PfsFileProps" parent="AdwWindow">
+    <property name="default-width">360</property>
+    <property name="default-height">500</property>
+    <property name="width-request">360</property>
+    <property name="height-request">200</property>
+    <property name="default-widget">accept_button</property>
+    <property name="content">
+      <object class="AdwToolbarView">
+        <child type="top">
+          <object class="AdwHeaderBar">
+            <property name="decoration-layout">""</property>
+            <property name="title-widget">
+              <object class="AdwWindowTitle">
+                <property name="title" translatable="yes">File Properties</property>
+              </object>
+            </property>
+            <child type="end">
+              <object class="GtkButton" id="accept_button">
+                <property name="child">
+                  <object class="GtkLabel">
+                    <property name="label" translatable="yes">Ok</property>
+                    <property name="ellipsize">middle</property>
+                    <property name="use-underline">True</property>
+                  </object>
+                </property>
+                <signal name="clicked" handler="on_accept_clicked" swapped="true"/>
+                <style>
+                  <class name="suggested-action"/>
+                </style>
+              </object>
+            </child>
+          </object>
+        </child>
+        <child>
+          <object class="AdwToastOverlay" id="toast_overlay">
+            <property name="child">
+              <object class="GtkScrolledWindow">
+                <property name="vscrollbar-policy">automatic</property>
+                <property name="hscrollbar-policy">never</property>
+                <property name="child">
+                  <object class="GtkBox">
+                    <property name="orientation">vertical</property>
+                    <property name="spacing">12</property>
+                    <property name="margin-start">12</property>
+                    <property name="margin-end">12</property>
+                    <property name="margin-bottom">12</property>
+                    <child>
+                      <object class="GtkImage" id="icon">
+                        <property name="icon-name">image-missing-symbolic</property>
+                        <property name="pixel-size">256</property>
+                        <style>
+                          <class name="icon-dropshadow"/>
+                        </style>
+                        <accessibility>
+                          <relation name="labelled-by">name_label</relation>
+                        </accessibility>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="GtkLabel" id="name_label">
+                        <binding name="label">
+                          <closure type="gchararray" function="file_to_string">
+                            <lookup name="file">PfsFileProps</lookup>
+                          </closure>
+                        </binding>
+                        <property name="selectable">True</property>
+                        <property name="ellipsize">end</property>
+                        <property name="max-width-chars">24</property>
+                        <property name="wrap">true</property>
+                        <property name="wrap-mode">PANGO_WRAP_WORD_CHAR</property>
+                        <property name="lines">3</property>
+                        <property name="justify">center</property>
+                        <style>
+                          <class name="title-3"/>
+                        </style>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="GtkLabel" id="type_label">
+                        <property name="ellipsize">end</property>
+                        <property name="selectable">True</property>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="GtkLabel" id="size_label">
+                        <property name="selectable">True</property>
+                        <property name="ellipsize">end</property>
+                        <binding name="visible">
+                          <closure type="gboolean" function="file_type_to_size_label_visible">
+                            <lookup name="file-type">PfsFileProps</lookup>
+                          </closure>
+                        </binding>
+                        <style>
+                          <class name="caption"/>
+                        </style>
+                      </object>
+                    </child>
+
+                    <child>
+                      <object class="AdwPreferencesGroup">
+                        <binding name="visible">
+                          <closure type="gboolean" function="parent_folder_to_row_visible">
+                            <lookup name="parent-folder">PfsFileProps</lookup>
+                          </closure>
+                        </binding>
+                        <child>
+                          <object class="AdwActionRow" id="parent_folder_row">
+                            <property name="title" translatable="yes">Parent _Folder</property>
+                            <property name="selectable">False</property>
+                            <property name="subtitle-selectable">True</property>
+                            <property name="use-underline">True</property>
+                            <property name="use-markup">False</property>
+                            <binding name="subtitle">
+                              <closure type="gchararray" function="file_to_string">
+                                <lookup name="parent-folder">PfsFileProps</lookup>
+                              </closure>
+                            </binding>
+                            <style>
+                              <class name="property"/>
+                            </style>
+                            <signal name="activate" handler="on_open_parent_folder_clicked" swapped="yes"/>
+                            <child type="suffix">
+                              <object class="GtkButton">
+                                <property name="tooltip-text" translatable="yes">Open Parent Folder</property>
+                                <property name="icon-name">folder-open-symbolic</property>
+                                <property name="valign">center</property>
+                                <signal name="clicked" handler="on_open_parent_folder_clicked" swapped="yes"/>
+                                <style>
+                                  <class name="flat"/>
+                                </style>
+                              </object>
+                            </child>
+                          </object>
+                        </child>
+                      </object>
+                    </child>
+
+                    <child>
+                      <object class="AdwPreferencesGroup" id="timestamp_group">
+                        <child>
+                          <object class="AdwActionRow" id="access_row">
+                            <property name="title" translatable="yes">Accessed</property>
+                            <property name="visible">False</property>
+                            <property name="selectable">False</property>
+                            <property name="subtitle-selectable">True</property>
+                            <property name="subtitle-lines">1</property>
+                            <property name="use-markup">False</property>
+                            <style>
+                              <class name="property"/>
+                              <class name="numeric"/>
+                            </style>
+                          </object>
+                        </child>
+                        <child>
+                          <object class="AdwActionRow" id="modified_row">
+                            <property name="title" translatable="yes">Modified</property>
+                            <property name="visible">False</property>
+                            <property name="selectable">False</property>
+                            <property name="subtitle-selectable">True</property>
+                            <property name="subtitle-lines">1</property>
+                            <property name="use-markup">False</property>
+                            <style>
+                              <class name="property"/>
+                              <class name="numeric"/>
+                            </style>
+                          </object>
+                        </child>
+                        <child>
+                          <object class="AdwActionRow" id="created_row">
+                            <property name="title" translatable="yes">Created</property>
+                            <property name="visible">False</property>
+                            <property name="selectable">False</property>
+                            <property name="subtitle-selectable">True</property>
+                            <property name="subtitle-lines">1</property>
+                            <property name="use-markup">False</property>
+                            <style>
+                              <class name="property"/>
+                              <class name="numeric"/>
+                            </style>
+                          </object>
+                        </child>
+                      </object>
+                    </child>
+
+                  </object>
+                </property>
+              </object>
+            </property>
+          </object>
+        </child>
+      </object>
+    </property>
+    <signal name="close-request" handler="on_close_requested" swapped="true"/>
+    <style>
+      <class name="pfs-file-props"/>
+    </style>
+  </template>
+</interface>
