@@ -127,6 +127,8 @@ mod imp {
         pub debounce_id: RefCell<Option<glib::SourceId>>,
         pub no_thumbnails: RefCell<HashMap<String, GridItem>>,
         pub thumbnailer_proxy: RefCell<Option<gio::DBusProxy>>,
+
+        pub select_item_id: RefCell<Option<glib::SignalHandlerId>>,
     }
 
     #[glib::object_subclass]
@@ -828,5 +830,70 @@ impl DirView {
         let sorter = self.imp().sorted_list.sorter().unwrap();
         let change = gtk::SorterChange::Inverted;
         sorter.emit_by_name::<()>("changed", &[&change]);
+    }
+
+    fn select_item_real(&self, item: &gio::File) {
+        let imp = self.imp();
+        let uri = item.uri();
+        glib::g_debug!(LOG_DOMAIN, "Selecting {uri}");
+
+        if let Some(select_item_id) = imp.select_item_id.replace(None) {
+            imp.directory_list.disconnect(select_item_id);
+        }
+
+        if let Some(model) = imp.single_selection.model() {
+            let n_items = model.n_items();
+
+            if n_items == 0 {
+                return;
+            }
+
+            if let Some(name) = item.basename() {
+                for n in 0..n_items - 1 {
+                    let s = model.item(n);
+
+                    if let Some(info) = s {
+                        if info.downcast_ref::<gio::FileInfo>().unwrap().name() == name {
+                            glib::g_debug!(LOG_DOMAIN, "Found {name:?}, selecting");
+                            imp.grid_view
+                                .scroll_to(n, gtk::ListScrollFlags::SELECT, None);
+                            return;
+                        }
+                    }
+                }
+                glib::g_warning!(LOG_DOMAIN, "Couldn't find {name:?} in folder");
+            }
+        } else {
+            glib::g_warning!(LOG_DOMAIN, "Couldn't get model");
+        }
+    }
+
+    pub fn select_item(&self, item: &gio::File) {
+        let imp = self.imp();
+
+        if imp.display_mode.get() == DisplayMode::Loading {
+            glib::g_debug!(LOG_DOMAIN, "Folder content still Loading");
+
+            if let Some(select_item_id) = imp.select_item_id.replace(None) {
+                imp.directory_list.disconnect(select_item_id);
+            }
+
+            let select_item_id = imp.directory_list.connect_loading_notify(clone!(
+                #[weak(rename_to = this)]
+                self,
+                #[strong(rename_to = toselect)]
+                item,
+                move |dirlist| {
+                    if dirlist.is_loading() {
+                        return;
+                    }
+                    glib::g_debug!(LOG_DOMAIN, "Loading finished");
+                    this.select_item_real(&toselect);
+                }
+            ));
+            imp.select_item_id.replace(Some(select_item_id));
+        } else {
+            self.select_item_real(item);
+        }
     }
 }
