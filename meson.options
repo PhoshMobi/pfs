@@ -5,3 +5,7 @@ option('examples',
 option('shared-lib',
        type: 'boolean', value: false,
        description: 'Build shared library')
+
+option('systemd_user_unit_dir',
+       type: 'string', value: '',
+       description: 'Directory for systemd user units')

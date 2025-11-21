@@ -1,0 +1,4 @@
+[D-BUS Service]
+Name=@busname@
+Exec=@bindir@/@bin@ --gapplication-service
+SystemdService=@app_id@.service
