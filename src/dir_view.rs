@@ -533,7 +533,9 @@ impl DirView {
 
         grid_item.set_fileinfo(info);
 
-        if info.boolean(gio::FILE_ATTRIBUTE_THUMBNAIL_IS_VALID) {
+        if info.boolean(gio::FILE_ATTRIBUTE_THUMBNAIL_IS_VALID)
+            || self.thumbnail_mode() == ThumbnailMode::Never
+        {
             return;
         }
 
