@@ -2,6 +2,13 @@
 name = "PhoshFileSelector"
 version = "0.0.5"
 edition = "2021"
+description = "A file selector widget for Phosh using gtk-rs"
+readme = "README.md"
+homepage = "https://phosh.mobi"
+repository = "https://gitlab.gnome.org/World/Phosh/pfs"
+license = "GPL-3.0-or-later"
+keywords = ["gtk", "adwaita", "phosh"]
+exclude = ["/debian"]
 
 [lib]
 name = "pfs"
