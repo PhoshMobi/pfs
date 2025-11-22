@@ -65,7 +65,7 @@ mod imp {
                 if let Some(path) = info.attribute_byte_string("thumbnail::path") {
                     let valid = info.boolean("thumbnail::is-valid");
                     if valid {
-                        self.icon.get().set_from_file(Some(path));
+                        self.icon.set_from_file(Some(path));
                         have_thumbnail = true;
                     }
                 }
@@ -73,13 +73,13 @@ mod imp {
 
             if !have_thumbnail {
                 if let Some(icon) = info.icon() {
-                    self.icon.get().set_from_gicon(&icon);
+                    self.icon.set_from_gicon(&icon);
                 }
             }
         }
 
         fn set_fileinfo(&self, info: gio::FileInfo) {
-            self.label.get().set_label(&info.display_name());
+            self.label.set_label(&info.display_name());
 
             *self.fileinfo.borrow_mut() = Some(info);
             self.update_image();
@@ -129,7 +129,7 @@ impl GridItem {
         let imp = self.imp();
 
         if *imp.thumbnail_mode.borrow() != ThumbnailMode::Never {
-            imp.icon.get().set_from_file(Some(path));
+            imp.icon.set_from_file(Some(path));
         }
     }
 }
