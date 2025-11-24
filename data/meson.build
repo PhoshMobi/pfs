@@ -15,20 +15,33 @@ foreach example : examples
     output: example[0] + '.desktop',
     po_dir: '../po',
     install: get_option('examples'),
-    install_dir: get_option('datadir') / 'applications',
+    install_dir: datadir / 'applications',
     type: 'desktop',
   )
 endforeach
+
+filemanager1 = 'org.freedesktop.FileManager1'
+app_id = examples[1][0]
+serviceconf = configuration_data()
+serviceconf.set('app_id', app_id)
+serviceconf.set('bindir', bindir)
+serviceconf.set('busname', filemanager1)
+serviceconf.set('bin', examples[1][1])
+configure_file(
+  input: f'@app_id@.service.in',
+  output: f'@app_id@.service',
+  configuration: serviceconf,
+  install_dir: servicedir,
+)
+
+subdir('systemd')
 
 desktop_utils = find_program('desktop-file-validate', required: false)
 if desktop_utils.found()
   test('Validate desktop file', desktop_utils, args: merged)
 endif
 
-install_data(
-  'mobi.phosh.FileSelector.gschema.xml',
-  install_dir: get_option('datadir') / 'glib-2.0' / 'schemas',
-)
+install_data('mobi.phosh.FileSelector.gschema.xml', install_dir: datadir / 'glib-2.0' / 'schemas')
 
 compile_schemas = find_program('glib-compile-schemas', required: false)
 if compile_schemas.found()

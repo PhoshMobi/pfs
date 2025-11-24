@@ -2,9 +2,15 @@ project(
   'PhoshFileSelector',
   ['rust', 'c'],
   version: '0.0.5',
-  meson_version: '>= 1.0.0',
+  meson_version: '>= 1.1.0',
   default_options: ['warning_level=2', 'werror=false'],
 )
+
+prefix = get_option('prefix')
+bindir = prefix / get_option('bindir')
+datadir = prefix / get_option('datadir')
+libdir = prefix / get_option('libdir')
+servicedir = datadir / 'dbus-1' / 'services'
 
 i18n = import('i18n')
 gnome = import('gnome')

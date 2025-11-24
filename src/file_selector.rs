@@ -662,6 +662,10 @@ impl FileSelector {
 
         self.set_current_folder(file);
     }
+
+    pub fn select_item(&self, item: &gio::File) {
+        self.imp().dir_view.select_item(item);
+    }
 }
 
 // C bindings:

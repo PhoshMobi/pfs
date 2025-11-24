@@ -11,6 +11,7 @@ Build-Depends:
  libglib2.0-dev (>= 2.74),
  libgtk-4-dev (>= 4.12),
  meson,
+ systemd-dev,
  patchelf,
  rustc (>= 1.86) <!pkg.pfs.rustup>,
  rustup <pkg.pfs.rustup>,
@@ -25,7 +26,8 @@ Multi-Arch: foreign
 Description: Phosh File Chooser Utils
  pfs is a library providing a file choser and related tooling.
  .
- This package contains additional utilities.
+ This package contains additional utilities like an implementation
+ of the org.freedesktop.FileManager1 interface.
 
 Package: pfs-demo
 Architecture: linux-any

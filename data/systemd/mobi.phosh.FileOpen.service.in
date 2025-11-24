@@ -1,0 +1,7 @@
+[Unit]
+Description=A simple File Browser
+
+[Service]
+Type=dbus
+BusName=@busname@
+ExecStart=@bindir@/@bin@ --gapplication-service

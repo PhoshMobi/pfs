@@ -1,3 +1,5 @@
-usr/bin/
+usr/bin/pfs-open
+usr/lib/systemd/user/mobi.phosh.FileOpen.service
 usr/share/applications/mobi.phosh.FileOpen.desktop
+usr/share/dbus-1/services/mobi.phosh.FileOpen.service
 usr/share/icons/hicolor/scalable/apps/mobi.phosh.FileOpen.svg
