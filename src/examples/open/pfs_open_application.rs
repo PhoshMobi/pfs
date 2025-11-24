@@ -226,6 +226,7 @@ impl PfsOpenApplication {
             .property("accept_label", gettextrs::gettext("Open"))
             .property("title", gettextrs::gettext("Select a File"))
             .property("current-folder", dir)
+            .property("close-on-done", false)
             .build();
 
         file_selector.connect_closure(

@@ -119,6 +119,10 @@ pub mod imp {
         // The user selected choices
         #[property(get = Self::get_selected_choices, builder(glib::VariantTy::ARRAY))]
         pub selected_choices: RefCell<Option<glib::Variant>>,
+
+        // Whether to close the window after a selection
+        #[property(get, set, construct, default = true)]
+        pub close_on_done: Cell<bool>,
     }
 
     #[glib::object_subclass]
@@ -182,7 +186,7 @@ pub mod imp {
                 self.done.replace(true);
             }
 
-            if close {
+            if close && self.close_on_done.get() {
                 self.obj().close();
             }
         }
