@@ -215,6 +215,42 @@ impl PfsOpenApplication {
         }
     }
 
+    fn show_open_error(&self, parent: &FileSelector, err_msg: &str) {
+        self.app_hold();
+
+        let dialog = adw::AlertDialog::new(
+            Some(&gettextrs::gettext("Error opening file")),
+            Some(err_msg),
+        );
+
+        dialog.add_response("ok", &gettextrs::gettext("Ok"));
+        dialog.choose(
+            parent,
+            None::<&gio::Cancellable>,
+            clone!(
+                #[weak(rename_to = this)]
+                self,
+                move |_response| {
+                    this.app_release();
+                }
+            ),
+        );
+    }
+
+    fn spawn_gio(&self, uri: &str, parent: &FileSelector) -> bool {
+        let result = Command::new("gio").arg("--open").arg(uri).status();
+
+        if let Ok(result) = result {
+            if result.success() {
+                return true;
+            }
+        }
+
+        let msg = &gettextrs::gettext("Failed open {}").replacen("{}", uri, 1);
+        self.show_open_error(parent, msg);
+        false
+    }
+
     fn open_directory(&self, dir: &gio::File) -> FileSelector {
         let uri = dir.uri();
 
@@ -240,21 +276,15 @@ impl PfsOpenApplication {
                     let selected = selector.selected();
 
                     if success {
-                        let uris = match selected {
-                            None => vec!["".to_string()],
-                            Some(vec) => vec,
-                        };
-                        glib::g_message!(LOG_DOMAIN, "Opening {uris:#?}");
-
-                        Command::new("gio")
-                            .arg("open")
-                            .arg(&uris[0])
-                            .spawn()
-                            .expect("Failed to open {uris[0]:?}")
-                            .wait()
-                            .expect("Failed to spawn gio");
+                        if let Some(uris) = selected {
+                            for uri in &uris {
+                                glib::g_message!(LOG_DOMAIN, "Opening {uri}");
+                                this.spawn_gio(uri, &selector);
+                            }
+                        } else {
+                            this.show_open_error(&selector, "Nothing selected");
+                        }
                     }
-
                     this.app_release();
                 }
             ),
