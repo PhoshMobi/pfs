@@ -197,15 +197,30 @@ impl PfsOpenApplication {
             .build()
     }
 
-    fn open_directory(&self, dir: &gio::File) -> FileSelector {
+    fn app_release(&self) {
         let imp = self.imp();
+
+        if imp.hold_count.replace(imp.hold_count.get() - 1) == 1 {
+            // Drop the gapplication ref count
+            self.imp().hold_guard.replace(None);
+        }
+    }
+
+    fn app_hold(&self) {
+        let imp = self.imp();
+
+        if imp.hold_count.replace(imp.hold_count.get() + 1) == 0 {
+            // Bump the gapplication ref count
+            *self.imp().hold_guard.borrow_mut() = Some(self.hold());
+        }
+    }
+
+    fn open_directory(&self, dir: &gio::File) -> FileSelector {
         let uri = dir.uri();
 
         glib::g_message!(LOG_DOMAIN, "Opening {uri}");
 
-        if imp.hold_count.replace(imp.hold_count.get() + 1) == 0 {
-            *self.imp().hold_guard.borrow_mut() = Some(self.hold());
-        }
+        self.app_hold();
 
         let file_selector = glib::Object::builder::<FileSelector>()
             .property("accept_label", gettextrs::gettext("Open"))
@@ -221,7 +236,6 @@ impl PfsOpenApplication {
                 self,
                 move |selector: FileSelector, success: bool| {
                     glib::g_debug!(LOG_DOMAIN, "File dialog done, result: {success}");
-                    let imp = this.imp();
                     let selected = selector.selected();
 
                     if success {
@@ -240,10 +254,7 @@ impl PfsOpenApplication {
                             .expect("Failed to spawn gio");
                     }
 
-                    if imp.hold_count.replace(imp.hold_count.get() - 1) == 1 {
-                        // Drop the application ref count
-                        this.imp().hold_guard.replace(None);
-                    }
+                    this.app_release();
                 }
             ),
         );
@@ -262,14 +273,11 @@ impl PfsOpenApplication {
     }
 
     fn show_item_properties(&self, file: &gio::File) {
-        let imp = self.imp();
         let uri = file.uri();
 
         glib::g_message!(LOG_DOMAIN, "Showing props for {uri}");
 
-        if imp.hold_count.replace(imp.hold_count.get() + 1) == 0 {
-            *self.imp().hold_guard.borrow_mut() = Some(self.hold());
-        }
+        self.app_hold();
 
         let file_props = glib::Object::builder::<FileProps>()
             .property("file", file)
@@ -283,12 +291,8 @@ impl PfsOpenApplication {
                 self,
                 move |_props: FileProps, success: bool| {
                     glib::g_debug!(LOG_DOMAIN, "File props dialog done, result: {success}");
-                    let imp = this.imp();
 
-                    if imp.hold_count.replace(imp.hold_count.get() - 1) == 1 {
-                        // Drop the application ref count
-                        this.imp().hold_guard.replace(None);
-                    }
+                    this.app_release();
                 }
             ),
         );
