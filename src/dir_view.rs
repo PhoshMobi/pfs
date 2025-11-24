@@ -617,9 +617,7 @@ impl DirView {
             return;
         }
 
-        let _ = self
-            .upcast_ref::<gtk::Widget>()
-            .activate_action("file-selector.accept", None);
+        let _ = self.activate_action("file-selector.accept", None);
     }
 
     #[template_callback]
