@@ -13,6 +13,7 @@ use gtk::{gio, glib};
 use std::cell::{Cell, RefCell};
 use std::process::Command;
 
+use pfs::file_props::FileProps;
 use pfs::file_selector::{FileSelector, FileSelectorMode};
 
 use crate::config::LOG_DOMAIN;
@@ -29,12 +30,10 @@ const FILE_MANAGER1_XML: &str = r#"
       <arg type='as' name='URIs' direction='in'/>
       <arg type='s' name='StartupId' direction='in'/>
     </method>
-<!-- Not yet implemented
     <method name='ShowItemProperties'>
       <arg type='as' name='URIs' direction='in'/>
       <arg type='s' name='StartupId' direction='in'/>
     </method>
--->
   </interface>
 </node>
 "#;
@@ -51,10 +50,18 @@ struct ShowItems {
     _startup_id: String,
 }
 
+#[derive(Debug, glib::Variant)]
+struct ShowItemProperties {
+    uris: Vec<String>,
+    _startup_id: String,
+}
+
+#[allow(clippy::enum_variant_names)]
 #[derive(Debug)]
 enum FileManager1 {
     ShowFolders(ShowFolders),
     ShowItems(ShowItems),
+    ShowItemProperties(ShowItemProperties),
 }
 
 mod imp {
@@ -70,6 +77,9 @@ mod imp {
             match method {
                 "ShowFolders" => Ok(params.get::<ShowFolders>().map(Self::ShowFolders)),
                 "ShowItems" => Ok(params.get::<ShowItems>().map(Self::ShowItems)),
+                "ShowItemProperties" => Ok(params
+                    .get::<ShowItemProperties>()
+                    .map(Self::ShowItemProperties)),
                 _ => Err(glib::Error::new(
                     gio::DBusError::UnknownMethod,
                     "No such method",
@@ -210,7 +220,7 @@ impl PfsOpenApplication {
                 #[weak(rename_to = this)]
                 self,
                 move |selector: FileSelector, success: bool| {
-                    glib::g_debug!(LOG_DOMAIN, "File dialog done, result: {success:#?}");
+                    glib::g_debug!(LOG_DOMAIN, "File dialog done, result: {success}");
                     let imp = this.imp();
                     let selected = selector.selected();
 
@@ -251,6 +261,41 @@ impl PfsOpenApplication {
         }
     }
 
+    fn show_item_properties(&self, file: &gio::File) {
+        let imp = self.imp();
+        let uri = file.uri();
+
+        glib::g_message!(LOG_DOMAIN, "Showing props for {uri}");
+
+        if imp.hold_count.replace(imp.hold_count.get() + 1) == 0 {
+            *self.imp().hold_guard.borrow_mut() = Some(self.hold());
+        }
+
+        let file_props = glib::Object::builder::<FileProps>()
+            .property("file", file)
+            .build();
+
+        file_props.connect_closure(
+            "done",
+            false,
+            glib::closure_local!(
+                #[weak(rename_to = this)]
+                self,
+                move |_props: FileProps, success: bool| {
+                    glib::g_debug!(LOG_DOMAIN, "File props dialog done, result: {success}");
+                    let imp = this.imp();
+
+                    if imp.hold_count.replace(imp.hold_count.get() - 1) == 1 {
+                        // Drop the application ref count
+                        this.imp().hold_guard.replace(None);
+                    }
+                }
+            ),
+        );
+
+        file_props.present();
+    }
+
     fn register_object(
         &self,
         connection: &gio::DBusConnection,
@@ -283,6 +328,17 @@ impl PfsOpenApplication {
                                 if let Some(app) = app {
                                     for uri in &uris {
                                         app.obj().select_item(&gio::File::for_uri(uri));
+                                    }
+                                }
+                                Ok(None)
+                            }
+                            FileManager1::ShowItemProperties(ShowItemProperties {
+                                uris,
+                                _startup_id,
+                            }) => {
+                                if let Some(app) = app {
+                                    for uri in &uris {
+                                        app.obj().show_item_properties(&gio::File::for_uri(uri));
                                     }
                                 }
                                 Ok(None)

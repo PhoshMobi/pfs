@@ -1,8 +1,10 @@
 # List of source files containing translatable strings.
+src/file_props.rs
 src/file_selector.rs
 src/init.rs
 src/places_box.rs
 src/util.rs
 
 src/dir-view.ui
+src/file-props.ui
 src/file-selector.ui

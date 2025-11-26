@@ -93,7 +93,7 @@ impl PfsDemoWindow {
             Some(vec) => vec,
         };
 
-        self.imp().selected_label.get().set_label(&uris[0]);
+        self.imp().selected_label.set_label(&uris[0]);
     }
 
     pub fn open_file(&self) {
@@ -148,22 +148,22 @@ impl PfsDemoWindow {
                     glib::g_debug!(LOG_DOMAIN, "File dialog done, result: {success:#?}");
                     let selected = selector.selected();
 
-                    this.imp().selected_label.get().set_label("");
-                    this.imp().choices_label.get().set_label("");
-                    this.imp().filter_label.get().set_label("");
+                    this.imp().selected_label.set_label("");
+                    this.imp().choices_label.set_label("");
+                    this.imp().filter_label.set_label("");
 
                     if success {
                         let uris = match selected {
                             None => vec!["".to_string()],
                             Some(vec) => vec,
                         };
-                        this.imp().selected_label.get().set_label(&uris[0]);
+                        this.imp().selected_label.set_label(&uris[0]);
 
                         let text = match selector.selected_choices() {
                             Some(choices) => choices.to_string(),
                             None => "".to_string(),
                         };
-                        this.imp().choices_label.get().set_label(&text);
+                        this.imp().choices_label.set_label(&text);
 
                         let pos = selector.current_filter();
                         let text = match selector.filters() {
@@ -178,7 +178,7 @@ impl PfsDemoWindow {
                             },
                             None => "".to_string(),
                         };
-                        this.imp().filter_label.get().set_label(&text);
+                        this.imp().filter_label.set_label(&text);
                     }
                 }
             ),

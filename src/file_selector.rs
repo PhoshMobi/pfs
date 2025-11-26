@@ -183,7 +183,7 @@ pub mod imp {
             }
 
             if close {
-                self.obj().upcast_ref::<gtk::Window>().close();
+                self.obj().close();
             }
         }
 
@@ -251,8 +251,7 @@ pub mod imp {
         fn set_choices_menu(&self, actions: gio::SimpleActionGroup, menu: &gio::Menu) {
             let obj = self.obj();
 
-            obj.upcast_ref::<gtk::Widget>()
-                .insert_action_group("custom-choices", Some(&actions));
+            obj.insert_action_group("custom-choices", Some(&actions));
 
             self.choices_menu_button.set_menu_model(Some(menu));
             self.choices_menu_button.set_visible(menu.n_items() > 0);
@@ -595,8 +594,7 @@ impl FileSelector {
             )
         );
 
-        self.upcast_ref::<gtk::Widget>()
-            .insert_action_group("file-selector", Some(&actions));
+        self.insert_action_group("file-selector", Some(&actions));
 
         // Keep `current-filter` in sync with action
         let filter_action = actions.lookup_action("set-filter").unwrap();
@@ -630,7 +628,7 @@ impl FileSelector {
         dialog.set_response_appearance("replace", adw::ResponseAppearance::Destructive);
 
         dialog.choose(
-            self.upcast_ref::<gtk::Widget>(),
+            self,
             None::<&gio::Cancellable>,
             clone!(
                 #[weak(rename_to = this)]

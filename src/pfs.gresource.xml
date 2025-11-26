@@ -3,6 +3,7 @@
   <gresource prefix="/mobi/phosh/FileSelector">
     <file preprocess="xml-stripblanks">dir-stack.ui</file>
     <file preprocess="xml-stripblanks">dir-view.ui</file>
+    <file preprocess="xml-stripblanks">file-props.ui</file>
     <file preprocess="xml-stripblanks">file-selector.ui</file>
     <file preprocess="xml-stripblanks">grid-item.ui</file>
     <file preprocess="xml-stripblanks">path-bar.ui</file>
