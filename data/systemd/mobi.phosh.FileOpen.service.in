@@ -5,3 +5,4 @@ Description=A simple File Browser
 Type=dbus
 BusName=@busname@
 ExecStart=@bindir@/@bin@ --gapplication-service
+KillMode=process
