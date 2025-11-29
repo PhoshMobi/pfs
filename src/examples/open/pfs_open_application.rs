@@ -238,7 +238,7 @@ impl PfsOpenApplication {
     }
 
     fn spawn_gio(&self, uri: &str, parent: &FileSelector) -> bool {
-        let result = Command::new("gio").arg("--open").arg(uri).status();
+        let result = Command::new("gio").arg("open").arg(uri).status();
 
         if let Ok(result) = result {
             if result.success() {
