@@ -38,7 +38,7 @@ pub fn folder_to_name(file: gio::File) -> String {
         "recent:///" => return gettextrs::gettext("Recent"),
         "trash:///" => return gettextrs::gettext("Trash"),
         _ => {}
-    };
+    }
 
     let name = match file.path() {
         Some(path) => path

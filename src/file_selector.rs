@@ -520,7 +520,7 @@ impl FileSelector {
         if let Some(settings) = binding.as_ref() {
             let _ = settings.set_enum("sort-by", mode.value());
             let _ = settings.set_boolean("sort-reverse", reversed);
-        };
+        }
 
         let m = unsafe { SortMode::from_glib(mode.value()) };
         self.imp().dir_view.get().set_sorting(m, reversed);
