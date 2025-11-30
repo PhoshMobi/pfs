@@ -368,9 +368,9 @@ pub mod imp {
         }
 
         #[template_callback]
-        fn on_new_uri(&self, uri: String) {
+        fn on_new_uri(&self, uri: &str) {
             glib::g_debug!(LOG_DOMAIN, "New uri {uri:#?}");
-            self.obj().set_current_folder(gio::File::for_uri(&uri));
+            self.obj().set_current_folder(gio::File::for_uri(uri));
             self.bottom_sheet.get().set_open(false);
             self.search_entry.set_text("");
         }
