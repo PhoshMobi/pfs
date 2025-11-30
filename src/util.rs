@@ -81,7 +81,7 @@ pub fn folder_to_icon_name(file: gio::File) -> &'static str {
 }
 
 // Check if folder has a valid path (e.g. isn't recent:/// or trash:///
-pub fn is_valid_folder(folder: &Option<gio::File>) -> bool {
+pub fn is_valid_folder(folder: Option<&gio::File>) -> bool {
     if folder.is_none() {
         return false;
     }

@@ -448,7 +448,7 @@ pub mod imp {
         fn can_accept_file_or_dir(
             &self,
             _mode: FileSelectorMode,
-            folder: Option<gio::File>,
+            folder: Option<&gio::File>,
             has_selection: bool,
             text: &str,
         ) -> bool {
@@ -457,7 +457,7 @@ pub mod imp {
                     return false;
                 }
 
-                util::is_valid_folder(&folder)
+                util::is_valid_folder(folder)
             } else {
                 has_selection
             }
