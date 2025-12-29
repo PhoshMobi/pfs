@@ -1,3 +1,145 @@
+pfs (0.0.6) experimental; urgency=medium
+
+  [ Guido Günther ]
+  * Cargo.lock: Update
+  * dir-view: Remove redundant else blocks.
+    Makes clippy happy
+  * dir-view: Avoid match for booleans.
+    Makes clippy happy.
+  * dir_view: Initialize mode early.
+    No need to have the `let` separate.
+  * dir-view: Avoid iter()
+    Makes clippy happy
+  * dir-view: Avoid unnecessary return.
+    Makes clippy happy
+  * dir_view: Use a single match arm
+  * dir-view: Prefer is_empty() over len()
+    Make clippy happy
+  * dir-view: Use matches! macro.
+    Makes clippy happy
+  * dir-view: Use let Some()
+    Make clippy happy
+  * dir-view: Drop unnecessary return statements.
+    Makes clippy happy
+  * grid-item: Tweak semicolons.
+    Makes clippy happy
+  * build: Avoid format specifier.
+    Make clippy happy
+  * pfs-open: Split out opening dirs.
+    This will allow us to handle open
+  * pfs-open: Count running instances.
+    We only drop the hold guard when all windows close
+  * pfs-open: Handle open.
+    This allows us to run
+      pfs-open <directory1> <directory2>
+    to display its contents
+  * pfs-open: Don't borrow app-id.
+    Make clippy happy
+  * pfs-open: Wait() for child.
+    Makes clippy happy.
+  * pfs-open: Use "Open" on the button.
+    This is what happens. Also mark it as translatable.
+  * po: Add languages.
+    Otherwise the po files don't get installed
+  * treewide: Update copyright.
+    Update per FLA
+  * file-open: Improve desktop file and icon.
+    We drop the unused symbolic icons
+  * packaging: Ship schema, translations and example.
+    This allows library users to access them and will allow
+    us to drop make the subproject in the portal optional.
+  * ci: Build package
+  * ci: Switch to forky
+  * icons: Add icon for demo.
+    Make the Open one more colorful.
+  * doc: Use canonical matrix channel name
+  * ci: Fix markdown path.
+    We don't have anything in doc/
+  * treewide: Drop superfluous referencing.
+    Makes clippy happy
+  * treewide: Don't use outer doc comments.
+    Makes clippy happy
+  * treewide: Allow missing safety doc.
+    Let's see if we keep the C API around at all
+  * treewide: Avoid .iter()
+    Makes clippy happy
+  * treeview: Use ?-Operator to return `None`
+    If the return value of a function is `Option<>` `?` returns
+    None.
+    Makes clippy happy.
+  * file-selector: Avoid identical match bodies.
+    Makes clippy happy
+  * file-selector: Inline variables in format!()
+    Makes clippy happy
+  * file-selector: Use reference.
+    Makes clippy happy
+  * file-selector: Prefer `if let Some() =` over manual unwrap.
+    Easier to read and makes clippy happy.
+  * dir-view: Prefer `if let Some() =` over manual unwrap.
+    Easier to read and makes clippy happy
+  * dir-view: Allow for unnecessary unwrap.
+    This keeps the check order easy to read
+  * ci: Run clippy.
+    We allow it to fail for the moment until we fixed more warnings
+  * test: Add a minimal test.
+    This ensures that at least some things work
+  * ci: Run tests.
+    This ensures we can create the dialog and don't throw any criticals.
+  * docs: Add screenshots
+  * ci: Use prebuilt image
+  * packaging: Add rustup build profile.
+    This allows us to build with rustup
+  * dir-view: Don't thumbnail when disabled.
+    We don't want to create any thumbnails when it is disabled via the gsetting.
+    Fixes: 95befa2 ("dir-view: Create thumbnails for files without them")
+  * build: Use datadir
+  * file-selector: Allow to preselect items.
+    This allows us to preselect items. In case of a directory we
+    change into it right away.
+  * pfs-open: Add org.freedesktop.FileManager1 interface.
+    See examples/gio_dbus_register_object/main.rs in gtk-rs
+    ```
+    $ busctl --user call org.freedesktop.FileManager1 /org/freedesktop/FileManager1 org.freedesktop.FileManager1 ShowFolders ass 2 file:///tmp file:///etc asdf
+    $ busctl --user call org.freedesktop.FileManager1 /org/freedesktop/FileManager1 org.freedesktop.FileManager1 ShowItems ass 1 file:///tmp asdf
+    ```
+    We lack the `ShowItemProperties` method but that'll be
+    a completely separate window.
+  * pfs-open: Add DBus service and systemd unit.
+    This allows pfs-open to be used as mobi.phosh.FileManager1
+    implementation
+    Closes: https://gitlab.gnome.org/World/Phosh/pfs/-/issues/16
+  * file-selector: Drop some superfluous upcasts.
+    They're not needed
+  * dir-view: Drop superfluous upcast
+  * grid-item: Remove superfluous get()s
+  * examples: Remove superfluous gets()s
+  * build: Update metadata
+  * file-props: New dialog to show some file properties.
+    We show a thumbnail (if present), size and timestamps.
+  * open: Hook up `ShowItemProperties` too.
+    We thus support the full org.freedesktop.FileManager1 API
+    Test via
+    ```
+    busctl --user call org.freedesktop.FileManager1 /org/freedesktop/FileManager1 org.freedesktop.FileManager1 ShowItemProperties ass 1  file://$HOME/Pictures/ asdf
+    ```
+  * pfs-open: Move app hold and release into methods.
+    This makes it easier to follow the flow
+  * file-selector: Allow to keep dialog around after selection
+  * pfs-open: Improve error reporting.
+    Show a dialog on errors and also open all URLs.
+  * pfs-open: Fix gio invocation.
+    It's `open` not `--open`.
+  * treewide: Update to libadwaita 0.8.1 and fix fallout.
+    The alert dialog changed its signature for the parent due to our
+    fix.
+
+  [ Arun Mani J ]
+  * grid-item: Add `set_thumbnail`
+  * dir-view: Create thumbnails for files without them.
+    Closes: https://gitlab.gnome.org/guidog/pfs/-/issues/6
+
+ -- Guido Günther <agx@sigxcpu.org>  Mon, 29 Dec 2025 22:14:11 +0100
+
 pfs (0.0.5) experimental; urgency=medium
 
   * Initial packaging.
