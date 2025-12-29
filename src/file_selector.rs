@@ -632,7 +632,7 @@ impl FileSelector {
         dialog.set_response_appearance("replace", adw::ResponseAppearance::Destructive);
 
         dialog.choose(
-            self,
+            Some(self),
             None::<&gio::Cancellable>,
             clone!(
                 #[weak(rename_to = this)]

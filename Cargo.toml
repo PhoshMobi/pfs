@@ -30,5 +30,5 @@ gtk = { version = "0.10", package = "gtk4", features = ["gnome_47"] }
 
 [dependencies.adw]
 package = "libadwaita"
-version = "0.8"
+version = "0.8.1"
 features = ["v1_6"]
