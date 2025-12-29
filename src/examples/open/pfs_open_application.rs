@@ -225,7 +225,7 @@ impl PfsOpenApplication {
 
         dialog.add_response("ok", &gettextrs::gettext("Ok"));
         dialog.choose(
-            parent,
+            Some(parent),
             None::<&gio::Cancellable>,
             clone!(
                 #[weak(rename_to = this)]
