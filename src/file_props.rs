@@ -162,24 +162,24 @@ impl FileProps {
                 imp.created_row.set_subtitle(&fmt);
                 imp.created_row.set_visible(true);
                 have_timestamp = true;
-            };
-        };
+            }
+        }
 
         if let Some(modified) = info.modification_date_time() {
             if let Ok(fmt) = modified.format_iso8601() {
                 imp.modified_row.set_subtitle(&fmt);
                 imp.modified_row.set_visible(true);
                 have_timestamp = true;
-            };
-        };
+            }
+        }
 
         if let Some(access) = info.access_date_time() {
             if let Ok(fmt) = access.format_iso8601() {
                 imp.access_row.set_subtitle(&fmt);
                 imp.access_row.set_visible(true);
                 have_timestamp = true;
-            };
-        };
+            }
+        }
 
         if have_timestamp {
             imp.timestamp_group.set_visible(true);
@@ -193,7 +193,7 @@ impl FileProps {
             } else {
                 imp.type_label.set_label(&content_type);
             }
-        };
+        }
 
         if let Some(path) = info.attribute_byte_string("thumbnail::path") {
             if info.boolean("thumbnail::is-valid") {

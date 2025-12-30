@@ -368,9 +368,9 @@ pub mod imp {
         }
 
         #[template_callback]
-        fn on_new_uri(&self, uri: String) {
+        fn on_new_uri(&self, uri: &str) {
             glib::g_debug!(LOG_DOMAIN, "New uri {uri:#?}");
-            self.obj().set_current_folder(gio::File::for_uri(&uri));
+            self.obj().set_current_folder(gio::File::for_uri(uri));
             self.bottom_sheet.get().set_open(false);
             self.search_entry.set_text("");
         }
@@ -448,7 +448,7 @@ pub mod imp {
         fn can_accept_file_or_dir(
             &self,
             _mode: FileSelectorMode,
-            folder: Option<gio::File>,
+            folder: Option<&gio::File>,
             has_selection: bool,
             text: &str,
         ) -> bool {
@@ -457,7 +457,7 @@ pub mod imp {
                     return false;
                 }
 
-                util::is_valid_folder(&folder)
+                util::is_valid_folder(folder)
             } else {
                 has_selection
             }
@@ -520,7 +520,7 @@ impl FileSelector {
         if let Some(settings) = binding.as_ref() {
             let _ = settings.set_enum("sort-by", mode.value());
             let _ = settings.set_boolean("sort-reverse", reversed);
-        };
+        }
 
         let m = unsafe { SortMode::from_glib(mode.value()) };
         self.imp().dir_view.get().set_sorting(m, reversed);

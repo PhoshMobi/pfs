@@ -9,9 +9,8 @@
 use adw::prelude::*;
 use adw::subclass::prelude::*;
 use glib_macros::clone;
-use gtk::{gio, glib};
+use gtk::{gdk, gio, glib};
 use std::cell::{Cell, RefCell};
-use std::process::Command;
 
 use pfs::file_props::FileProps;
 use pfs::file_selector::{FileSelector, FileSelectorMode};
@@ -216,14 +215,14 @@ impl PfsOpenApplication {
     }
 
     fn show_open_error(&self, parent: &FileSelector, err_msg: &str) {
-        self.app_hold();
-
         let dialog = adw::AlertDialog::new(
             Some(&gettextrs::gettext("Error opening file")),
             Some(err_msg),
         );
 
         dialog.add_response("ok", &gettextrs::gettext("Ok"));
+
+        self.app_hold();
         dialog.choose(
             Some(parent),
             None::<&gio::Cancellable>,
@@ -237,26 +236,38 @@ impl PfsOpenApplication {
         );
     }
 
-    fn spawn_gio(&self, uri: &str, parent: &FileSelector) -> bool {
-        let result = Command::new("gio").arg("open").arg(uri).status();
+    fn launch_for_uri(&self, uri: &str, parent: &FileSelector) {
+        let ctx = gdk::Display::default().map(|d| d.app_launch_context());
 
-        if let Ok(result) = result {
-            if result.success() {
-                return true;
-            }
-        }
-
-        let msg = &gettextrs::gettext("Failed open {}").replacen("{}", uri, 1);
-        self.show_open_error(parent, msg);
-        false
+        self.app_hold();
+        gio::AppInfo::launch_default_for_uri_async(
+            uri,
+            ctx.as_ref(),
+            None::<&gio::Cancellable>,
+            clone!(
+                #[weak(rename_to = this)]
+                self,
+                #[weak(rename_to = win)]
+                parent,
+                #[to_owned]
+                uri,
+                move |result| {
+                    if result.is_err() {
+                        let msg = &gettextrs::gettext("Failed to open {}").replace("{}", &uri);
+                        this.show_open_error(&win, msg);
+                    } else {
+                        glib::g_debug!(LOG_DOMAIN, "Launched {uri}");
+                    }
+                    this.app_release();
+                },
+            ),
+        );
     }
 
     fn open_directory(&self, dir: &gio::File) -> FileSelector {
         let uri = dir.uri();
 
         glib::g_message!(LOG_DOMAIN, "Opening {uri}");
-
-        self.app_hold();
 
         let file_selector = glib::Object::builder::<FileSelector>()
             .property("accept_label", gettextrs::gettext("Open"))
@@ -279,7 +290,7 @@ impl PfsOpenApplication {
                         if let Some(uris) = selected {
                             for uri in &uris {
                                 glib::g_message!(LOG_DOMAIN, "Opening {uri}");
-                                this.spawn_gio(uri, &selector);
+                                this.launch_for_uri(uri, &selector);
                             }
                         } else {
                             this.show_open_error(&selector, "Nothing selected");
@@ -290,6 +301,7 @@ impl PfsOpenApplication {
             ),
         );
 
+        self.app_hold();
         file_selector.set_mode(FileSelectorMode::OpenFile);
         file_selector.present();
 

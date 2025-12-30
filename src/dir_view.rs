@@ -167,7 +167,7 @@ mod imp {
                 return;
             }
 
-            let has_selection = util::is_valid_folder(&self.folder.borrow());
+            let has_selection = util::is_valid_folder(self.folder.borrow().as_ref());
             self.set_has_selection(has_selection);
         }
 

@@ -146,7 +146,7 @@ impl PlacesBox {
     }
 
     #[template_callback]
-    fn on_new_uri(&self, uri: String) {
+    fn on_new_uri(&self, uri: &str) {
         // Pass on new uri from path bar
         self.imp().obj().emit_by_name::<()>("new-uri", &[&uri]);
     }
