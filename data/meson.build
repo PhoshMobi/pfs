@@ -13,6 +13,14 @@ if compile_schemas.found()
 endif
 compiled = gnome.compile_schemas(build_by_default: true)
 
+#
+# Examples
+#
+
+if not get_option('examples')
+  subdir_done()
+endif
+
 foreach example : examples
 
   desktopconf = configuration_data()
