@@ -28,6 +28,8 @@ run_data = configuration_data()
 run_data.set('ABS_BUILDDIR', meson.current_build_dir())
 configure_file(input: 'run.in', output: 'run', configuration: run_data)
 
+summary({'Examples': get_option('examples')}, bool_yn: true)
+
 gnome.post_install(
   glib_compile_schemas: true,
   gtk_update_icon_cache: get_option('examples'),
