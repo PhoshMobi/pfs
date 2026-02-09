@@ -1,6 +1,6 @@
 [package]
 name = "PhoshFileSelector"
-version = "0.0.5"
+version = "0.0.7"
 edition = "2021"
 description = "A file selector widget for Phosh using gtk-rs"
 readme = "README.md"

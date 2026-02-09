@@ -1,3 +1,12 @@
+pfs 0.0.7
+---------
+Released February 2026
+* Robustify pfs-open
+* Simplify subproject usage
+* Make clippy happy
+* Contributors:
+    * Guido Günther
+
 pfs 0.0.6
 ---------
 Released December 2025
