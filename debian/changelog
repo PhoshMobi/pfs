@@ -1,3 +1,25 @@
+pfs (0.0.7) experimental; urgency=medium
+
+  * treewide: Drop some superfluous semicolons
+  * treewide: Prefer &str over String
+  * util: Use more idiomatic Option<&T> rather than &Option<T>
+    &Option<T> is always a bit confusing
+  * pfs-open: Only kill process on shutdown.
+    Otherwise when using the org.freedesktop.FileManager1 interface
+    systemd will reap the whole cgroup and thus the spawned process
+    as well. We should likely use something like phosh's app-tracker
+    to move to a separate systemd scope at some point.
+  * pfs-open: Launch directly.
+    Avoid `gio open` reducing dependencies and fewer forks.
+  * build: Add option summary
+  * build: Move examples to the end.
+    Pure code move
+  * build: Don't install icons, schema and example services.
+    We don't want to install them when examples are disabled.
+  * treewide: Release 0.0.7
+
+ -- Guido Günther <agx@sigxcpu.org>  Mon, 09 Feb 2026 14:10:15 +0100
+
 pfs (0.0.6) experimental; urgency=medium
 
   [ Guido Günther ]
