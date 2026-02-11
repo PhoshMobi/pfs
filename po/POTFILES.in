@@ -8,3 +8,4 @@ src/util.rs
 src/dir-view.ui
 src/file-props.ui
 src/file-selector.ui
+src/grid-item.ui
