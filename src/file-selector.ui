@@ -9,6 +9,8 @@
     <property name="height-request">200</property>
     <property name="default-widget">accept_button</property>
     <property name="content">
+      <object class="AdwToastOverlay" id="toast_overlay">
+        <child>
       <object class="AdwBottomSheet" id="bottom_sheet">
         <property name="content">
           <object class="AdwToolbarView">
@@ -243,6 +245,8 @@
             </child>
           </object>
         </property>
+      </object>
+        </child>
       </object>
     </property>
     <signal name="close-request" handler="on_close_requested" swapped="true"/>
