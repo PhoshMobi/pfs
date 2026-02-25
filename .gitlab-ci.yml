@@ -1,6 +1,6 @@
 include:
  - project: 'World/Phosh/meta-phosh'
-   ref: '3629f479a3b1d37077137f05f988028c6e712378'
+   ref: 'c9e1eabe9b8e21ab7b4c754ea2310c7e42379b61'
    file: '/ci/phosh-common-jobs.yml'
  - project: 'Infrastructure/freedesktop-ci-templates'
    ref: 'd03cddbcff35f26861429fc816c00323f48e99af'
@@ -140,4 +140,5 @@ package-deb-debian-forky:
   variables:
     PHOSH_DOCKER_IMAGE: debian:forky
     DEB_BUILD_PROFILES:
+    PHOSH_ADDITIONAL_EXPERIMENTAL_PKGS: rustc
   extends: .phosh-build-debian-package
