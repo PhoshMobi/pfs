@@ -131,7 +131,7 @@ check-clippy:
   needs: [build]
   <<: *common_before_script
   script:
-    - eatmydata apt-get install -y rust-clippy
+    - rustup component add clippy
     # TODO: add -- -Dclippy::pedantic
     - CARGO_HOME=_build/cargo PFS_RESOURCE_DIR=$PWD/_build/src cargo clippy --no-deps -- -Dwarnings
 
