@@ -2,6 +2,42 @@
 <interface>
   <requires lib="gtk" version="4.0"/>
   <requires lib="libadwaita" version="1.0"/>
+  <menu id="dir_view_menu">
+    <section>
+      <item>
+        <!-- Translators: This is a sort order for files -->
+        <attribute name="label" translatable="yes">A-Z</attribute>
+        <attribute name="action">file-selector.sort</attribute>
+        <attribute name="target" type="(sb)">('name',false)</attribute>
+      </item>
+      <item>
+        <!-- Translators: This is a sort order for files -->
+        <attribute name="label" translatable="yes">Z-A</attribute>
+        <attribute name="action">file-selector.sort</attribute>
+        <attribute name="target" type="(sb)">('name',true)</attribute>
+      </item>
+    </section>
+    <section>
+      <item>
+        <!-- Translators: This is a sort order for files -->
+        <attribute name="label" translatable="yes">Last changed</attribute>
+        <attribute name="action">file-selector.sort</attribute>
+        <attribute name="target" type="(sb)">('mtime',true)</attribute>
+      </item>
+      <item>
+        <!-- Translators: This is a sort order for files -->
+        <attribute name="label" translatable="yes">First changed</attribute>
+        <attribute name="action">file-selector.sort</attribute>
+        <attribute name="target" type="(sb)">('mtime',false)</attribute>
+      </item>
+    </section>
+    <section>
+      <item>
+        <attribute name="label" translatable="yes">Show _Hidden Files</attribute>
+        <attribute name="action">file-selector.show-hidden-files</attribute>
+      </item>
+    </section>
+  </menu>
   <template class="PfsFileSelector" parent="AdwWindow">
     <property name="default-width">360</property>
     <property name="default-height">576</property>
@@ -254,42 +290,4 @@
       <class name="pfs-file-selector"/>
     </style>
   </template>
-  <interface>
-    <menu id="dir_view_menu">
-      <section>
-        <item>
-          <!-- Translators: This is a sort order for files -->
-          <attribute name="label" translatable="yes">A-Z</attribute>
-          <attribute name="action">file-selector.sort</attribute>
-          <attribute name="target" type="(sb)">('name',false)</attribute>
-        </item>
-        <item>
-          <!-- Translators: This is a sort order for files -->
-          <attribute name="label" translatable="yes">Z-A</attribute>
-          <attribute name="action">file-selector.sort</attribute>
-          <attribute name="target" type="(sb)">('name',true)</attribute>
-        </item>
-      </section>
-      <section>
-        <item>
-          <!-- Translators: This is a sort order for files -->
-          <attribute name="label" translatable="yes">Last changed</attribute>
-          <attribute name="action">file-selector.sort</attribute>
-          <attribute name="target" type="(sb)">('mtime',true)</attribute>
-        </item>
-        <item>
-          <!-- Translators: This is a sort order for files -->
-          <attribute name="label" translatable="yes">First changed</attribute>
-          <attribute name="action">file-selector.sort</attribute>
-          <attribute name="target" type="(sb)">('mtime',false)</attribute>
-        </item>
-      </section>
-      <section>
-        <item>
-          <attribute name="label" translatable="yes">Show _Hidden Files</attribute>
-          <attribute name="action">file-selector.show-hidden-files</attribute>
-        </item>
-      </section>
-    </menu>
-  </interface>
 </interface>
