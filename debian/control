@@ -13,7 +13,7 @@ Build-Depends:
  meson,
  systemd-dev,
  patchelf,
- rustc (>= 1.86) <!pkg.pfs.rustup>,
+ rustc (>= 1.92) <!pkg.pfs.rustup>,
  rustup <pkg.pfs.rustup>,
 Standards-Version: 4.6.2
 

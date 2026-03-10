@@ -42,17 +42,18 @@ variables:
   RUST_VERSION: stable
   GIT_SUBMODULE_STRATEGY: recursive
   DEBIAN_IMAGE: $CI_REGISTRY/world/phosh/pfs/debian:v0.0.2025-11-20.1
-  DEB_BUILD_PROFILES: pkg.pfs.rustup
+  SID_PKGS: rustc rust-clippy rustfmt
 
 .common_before_script: &common_before_script
   before_script:
-    - apt update
+    - !reference [.phosh-prepare-apt]
     - eatmydata apt build-dep -y --no-install-recommends .
-    - rustup default $RUST_VERSION
 
 build:
   stage: build
   image: ${DEBIAN_IMAGE}
+  variables:
+    PHOSH_ADDITIONAL_SID_PKGS: $SID_PKGS
   <<: *common_before_script
   script:
     - meson setup -Dexamples=true -Dshared-lib=true _build
@@ -65,6 +66,8 @@ build:
 build-lib:
   stage: build
   image: ${DEBIAN_IMAGE}
+  variables:
+    PHOSH_ADDITIONAL_SID_PKGS: $SID_PKGS
   <<: *common_before_script
   script:
     - meson setup -Dexamples=false -Dshared-lib=false _build
@@ -75,6 +78,8 @@ test:
   stage: test+docs
   image: ${DEBIAN_IMAGE}
   needs: [build]
+  variables:
+    PHOSH_ADDITIONAL_SID_PKGS: $SID_PKGS
   <<: *common_before_script
   script:
     - CARGO_HOME=_build/cargo PFS_RESOURCE_DIR=$PWD/_build/src xvfb-run cargo test
@@ -89,7 +94,6 @@ check-consistency:
 
 check-fmt:
   stage: style-checks
-  image: ${DEBIAN_IMAGE}
   needs: []
   image: rust
   interruptible: true
@@ -127,11 +131,12 @@ check-meson:
 
 check-clippy:
   stage: style-checks
-  image: ${DEBIAN_IMAGE}
   needs: [build]
+  image: ${DEBIAN_IMAGE}
+  variables:
+    PHOSH_ADDITIONAL_SID_PKGS: $SID_PKGS
   <<: *common_before_script
   script:
-    - rustup component add clippy
     # TODO: add -- -Dclippy::pedantic
     - CARGO_HOME=_build/cargo PFS_RESOURCE_DIR=$PWD/_build/src cargo clippy --no-deps -- -Dwarnings
 
@@ -140,5 +145,5 @@ package-deb-debian-forky:
   variables:
     PHOSH_DOCKER_IMAGE: debian:forky
     DEB_BUILD_PROFILES:
-    PHOSH_ADDITIONAL_EXPERIMENTAL_PKGS: rustc
+    PHOSH_ADDITIONAL_SID_PKGS: $SID_PKGS
   extends: .phosh-build-debian-package
