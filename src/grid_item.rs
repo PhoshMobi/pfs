@@ -12,7 +12,9 @@ use glib_macros::Properties;
 use gtk::{gio, glib, CompositeTemplate};
 use std::cell::{Cell, RefCell};
 
-use crate::dir_view::ThumbnailMode;
+use crate::{
+    config::LOG_DOMAIN, dir_view::ThumbnailMode, file_props::FileProps, file_selector::FileSelector,
+};
 
 mod imp {
     use super::*;
@@ -27,8 +29,11 @@ mod imp {
         #[template_child]
         pub label: TemplateChild<gtk::Label>,
 
+        #[template_child]
+        pub context_menu: TemplateChild<gtk::PopoverMenu>,
+
         #[property(get, set = Self::set_fileinfo)]
-        fileinfo: RefCell<Option<gio::FileInfo>>,
+        pub fileinfo: RefCell<Option<gio::FileInfo>>,
 
         #[property(get, set)]
         icon_size: Cell<u32>,
@@ -46,6 +51,13 @@ mod imp {
         fn class_init(klass: &mut Self::Class) {
             klass.bind_template();
             klass.bind_template_instance_callbacks();
+
+            klass.install_action("grid-item.show-property", None, move |item, _, _| {
+                item.show_properties();
+            });
+            klass.install_action("grid-item.copy-name", None, move |item, _, _| {
+                item.copy_to_clipboard();
+            });
         }
 
         fn instance_init(obj: &glib::subclass::InitializingObject<Self>) {
@@ -101,6 +113,12 @@ mod imp {
             self.parent_constructed();
             self.obj().set_icon_size(32);
         }
+
+        fn dispose(&self) {
+            if self.context_menu.parent().is_some() {
+                self.context_menu.unparent();
+            }
+        }
     }
 
     impl WidgetImpl for GridItem {}
@@ -131,5 +149,74 @@ impl GridItem {
         if *imp.thumbnail_mode.borrow() != ThumbnailMode::Never {
             imp.icon.set_from_file(Some(path));
         }
+    }
+
+    fn get_file_selector(&self) -> FileSelector {
+        self.root()
+            .and_then(|w| w.downcast_ref::<FileSelector>().cloned())
+            .expect("FileSelector must be at the root")
+    }
+
+    fn show_properties(&self) {
+        let imp = self.imp();
+
+        let fileinfo = imp.fileinfo.borrow();
+        let info = fileinfo.as_ref().unwrap();
+        let file = info
+            .attribute_object("standard::file")
+            .unwrap()
+            .downcast::<gio::File>()
+            .unwrap();
+
+        let uri = file.uri();
+        glib::g_debug!(LOG_DOMAIN, "Showing properties for {uri}");
+
+        let file_props = glib::Object::builder::<FileProps>()
+            .property("file", &file)
+            .build();
+
+        file_props.set_transient_for(Some(&self.get_file_selector()));
+        file_props.present();
+    }
+
+    fn copy_to_clipboard(&self) {
+        let imp = self.imp();
+
+        let filename = imp.label.text();
+
+        self.clipboard().set_text(&filename);
+
+        let toast_message = gettextrs::gettext("Copied to clipboard");
+        let toast = adw::Toast::builder()
+            .title(&toast_message)
+            .timeout(2)
+            .build();
+
+        self.get_file_selector().show_toast(toast);
+    }
+
+    fn show_context_menu(&self, x: f64, y: f64) {
+        // Disable context menu when used as portal
+        if self.get_file_selector().close_on_done() {
+            return;
+        }
+
+        let imp = self.imp();
+        let popover = &imp.context_menu;
+
+        popover.unparent();
+        popover.set_parent(self);
+        popover.set_pointing_to(Some(&gtk::gdk::Rectangle::new(x as i32, y as i32, 1, 1)));
+        popover.popup();
+    }
+
+    #[template_callback]
+    fn on_long_press_pressed(&self, x: f64, y: f64) {
+        self.show_context_menu(x, y);
+    }
+
+    #[template_callback]
+    fn on_right_click_pressed(&self, _n_press: i32, x: f64, y: f64) {
+        self.show_context_menu(x, y);
     }
 }

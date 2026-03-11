@@ -9,240 +9,244 @@
     <property name="height-request">200</property>
     <property name="default-widget">accept_button</property>
     <property name="content">
-      <object class="AdwBottomSheet" id="bottom_sheet">
-        <property name="content">
-          <object class="AdwToolbarView">
-            <property name="margin-bottom" bind-source="bottom_sheet" bind-property="bottom-bar-height"
-                      bind-flags="sync-create"/>
-            <child type="top">
-              <object class="AdwHeaderBar">
-                <property name="decoration-layout">""</property>
-                <property name="title-widget">
-                  <object class="AdwWindowTitle" id="window_title">
-                    <binding name="title">
-                      <lookup name="title" type="PfsFileSelector"/>
-                    </binding>
+      <object class="AdwToastOverlay" id="toast_overlay">
+        <child>
+          <object class="AdwBottomSheet" id="bottom_sheet">
+            <property name="content">
+              <object class="AdwToolbarView">
+                <property name="margin-bottom" bind-source="bottom_sheet" bind-property="bottom-bar-height"
+                          bind-flags="sync-create"/>
+                <child type="top">
+                  <object class="AdwHeaderBar">
+                    <property name="decoration-layout">""</property>
+                    <property name="title-widget">
+                      <object class="AdwWindowTitle" id="window_title">
+                        <binding name="title">
+                          <lookup name="title" type="PfsFileSelector"/>
+                        </binding>
+                      </object>
+                    </property>
+                    <child type="start">
+                      <object class="GtkButton">
+                        <property name="label">Cancel</property>
+                        <property name="action-name">window.close</property>
+                        <property name="child">
+                          <object class="GtkLabel">
+                            <property name="label">Cancel</property>
+                            <property name="ellipsize">middle</property>
+                            <property name="use-underline">True</property>
+                          </object>
+                        </property>
+                      </object>
+                    </child>
+                    <child type="end">
+                      <object class="GtkButton" id="accept_button">
+                        <binding name="sensitive">
+                          <closure type="gboolean" function="can_accept_file_or_dir">
+                            <lookup name="mode">PfsFileSelector</lookup>
+                            <lookup name="current-folder">PfsFileSelector</lookup>
+                            <lookup name="has-selection">dir_view</lookup>
+                            <lookup name="text">filename_buffer</lookup>
+                          </closure>
+                        </binding>
+                        <property name="child">
+                          <object class="GtkLabel">
+                            <binding name="label">
+                              <lookup name="accept-label" type="PfsFileSelector"/>
+                            </binding>
+                            <property name="ellipsize">middle</property>
+                            <property name="use-underline">True</property>
+                          </object>
+                        </property>
+                        <signal name="clicked" handler="on_accept_clicked" swapped="true"/>
+                        <style>
+                          <class name="suggested-action"/>
+                        </style>
+                      </object>
+                    </child>
+                  </object>
+                </child>
+                <property name="content">
+                  <object class="PfsDirView" id="dir_view">
+                    <property name="directories-only" bind-source="PfsFileSelector" bind-property="directory" bind-flags="sync-create"/>
+                    <property name="folder" bind-source="PfsFileSelector" bind-property="current-folder" bind-flags="sync-create"/>
+                    <property name="margin-start">6</property>
+                    <property name="margin-end">6</property>
+                    <signal name="new-uri" handler="on_new_uri" swapped="true"/>
+                    <signal name="new-filename" handler="on_new_filename" swapped="true"/>
                   </object>
                 </property>
-                <child type="start">
-                  <object class="GtkButton">
-                    <property name="label">Cancel</property>
-                    <property name="action-name">window.close</property>
+              </object>
+            </property>
+            <property name="sheet">
+              <object class="AdwToolbarView">
+                <child type="top">
+                  <object class="AdwHeaderBar"/>
+                </child>
+                <property name="content">
+                  <object class="GtkScrolledWindow">
+                    <property name="vscrollbar-policy">automatic</property>
+                    <property name="hscrollbar-policy">never</property>
+                    <property name="propagate-natural-height">True</property>
+                    <child>
+                      <object class="PfsPlacesBox" id="places_box">
+                        <property name="folder" bind-source="PfsFileSelector" bind-property="current-folder" bind-flags="sync-create"/>
+                        <signal name="new-uri" handler="on_new_uri" swapped="true"/>
+                      </object>
+                    </child>
+                  </object>
+                </property>
+              </object>
+            </property>
+            <property name="bottom-bar">
+              <object class="GtkBox">
+                <property name="orientation">vertical</property>
+                <child>
+                  <object class="AdwClamp">
+                    <property name="maximum-size">360</property>
                     <property name="child">
-                      <object class="GtkLabel">
-                        <property name="label">Cancel</property>
-                        <property name="ellipsize">middle</property>
-                        <property name="use-underline">True</property>
+                      <object class="GtkCenterBox">
+                        <binding name="visible">
+                          <closure type="gboolean" function="mode_to_filename_entry">
+                            <lookup name="mode">PfsFileSelector</lookup>
+                          </closure>
+                        </binding>
+                        <property name="height-request">46</property>
+                        <property name="start-widget">
+                          <object class="GtkLabel">
+                            <property name="label" translatable="yes">Name</property>
+                            <property name="halign">end</property>
+                            <property name="hexpand">True</property>
+                            <property name="margin-start">6</property>
+                            <property name="margin-end">6</property>
+                          </object>
+                        </property>
+                        <property name="center-widget">
+                          <object class="GtkEntry">
+                            <property name="valign">center</property>
+                            <property name="hexpand">True</property>
+                            <property name="activates-default">True</property>
+                            <property name="buffer">
+                              <object class="GtkEntryBuffer" id="filename_buffer">
+                                <property name="text" bind-source="PfsFileSelector" bind-property="filename"
+                                          bind-flags="sync-create|bidirectional"/>
+                              </object>
+                            </property>
+                          </object>
+                        </property>
                       </object>
                     </property>
                   </object>
                 </child>
-                <child type="end">
-                  <object class="GtkButton" id="accept_button">
-                    <binding name="sensitive">
-                      <closure type="gboolean" function="can_accept_file_or_dir">
-                        <lookup name="mode">PfsFileSelector</lookup>
-                        <lookup name="current-folder">PfsFileSelector</lookup>
-                        <lookup name="has-selection">dir_view</lookup>
-                        <lookup name="text">filename_buffer</lookup>
-                      </closure>
-                    </binding>
+                <child>
+                  <object class="GtkSearchBar" id="search_bar">
+                    <property name="key-capture-widget">PfsFileSelector</property>
                     <property name="child">
-                      <object class="GtkLabel">
-                        <binding name="label">
-                          <lookup name="accept-label" type="PfsFileSelector"/>
-                        </binding>
-                        <property name="ellipsize">middle</property>
-                        <property name="use-underline">True</property>
+                      <object class="GtkSearchEntry" id="search_entry">
+                        <property name="input-hints">no-emoji</property>
+                        <property name="input-purpose">terminal</property>
+                        <property name="placeholder-text" translatable="yes">Filename</property>
+                        <signal name="search-changed" handler="on_search_changed" swapped="true"/>
                       </object>
                     </property>
-                    <signal name="clicked" handler="on_accept_clicked" swapped="true"/>
+                  </object>
+                </child>
+                <child>
+                  <object class="GtkCenterBox">
+                    <property name="height-request">46</property>
+                    <property name="start-widget">
+                      <object class="PfsDirStack" id="dir_stack">
+                        <property name="folder" bind-source="PfsFileSelector" bind-property="current-folder" bind-flags="sync-create"/>
+                        <signal name="new-uri" handler="on_new_uri" swapped="true"/>
+                      </object>
+                    </property>
+                    <property name="center-widget">
+                      <object class="GtkBox">
+                        <property name="spacing">6</property>
+                        <child>
+                          <object class="GtkImage">
+                            <binding name="icon-name">
+                              <closure type="gchararray" function="folder_to_icon_name">
+                                <lookup name="current-folder">PfsFileSelector</lookup>
+                              </closure>
+                            </binding>
+                          </object>
+                        </child>
+                        <child>
+                          <object class="GtkLabel">
+                            <binding name="label">
+                              <closure type="gchararray" function="folder_to_label">
+                                <lookup name="current-folder">PfsFileSelector</lookup>
+                              </closure>
+                            </binding>
+                            <binding name="tooltip-text">
+                              <closure type="gchararray" function="folder_to_tooltip">
+                                <lookup name="current-folder">PfsFileSelector</lookup>
+                              </closure>
+                            </binding>
+                            <property name="ellipsize">end</property>
+                          </object>
+                        </child>
+                      </object>
+                    </property>
+                    <property name="end-widget">
+                      <object class="GtkBox">
+                        <property name="spacing">6</property>
+                        <child>
+                          <object class="GtkMenuButton" id="choices_menu_button">
+                            <property name="visible">False</property>
+                            <property name="focus-on-click">False</property>
+                            <property name="halign">center</property>
+                            <property name="valign">center</property>
+                            <property name="icon-name">settings-symbolic</property>
+                          </object>
+                        </child>
+                        <child>
+                          <object class="GtkMenuButton">
+                            <binding name="visible">
+                              <closure type="gboolean" function="n_items_to_visible">
+                                <lookup name="filters">PfsFileSelector</lookup>
+                              </closure>
+                            </binding>
+                            <property name="focus-on-click">False</property>
+                            <property name="halign">center</property>
+                            <property name="valign">center</property>
+                            <property name="popover">
+                              <object class="GtkPopoverMenu" id="filters_popover">
+                                <binding name="menu-model">
+                                  <closure type="GMenuModel" function="filters_to_menu_model">
+                                    <lookup name="filters">PfsFileSelector</lookup>
+                                  </closure>
+                                </binding>
+                              </object>
+                            </property>
+                            <property name="icon-name">funnel-symbolic</property>
+                          </object>
+                        </child>
+                        <child>
+                          <object class="GtkMenuButton">
+                            <property name="focus-on-click">False</property>
+                            <property name="halign">center</property>
+                            <property name="valign">center</property>
+                            <property name="popover">
+                              <object class="GtkPopoverMenu">
+                                <property name="menu-model">dir_view_menu</property>
+                              </object>
+                            </property>
+                            <property name="icon-name">view-list-symbolic</property>
+                          </object>
+                        </child>
+                      </object>
+                    </property>
                     <style>
-                      <class name="suggested-action"/>
+                      <class name="toolbar"/>
                     </style>
                   </object>
                 </child>
               </object>
-            </child>
-            <property name="content">
-              <object class="PfsDirView" id="dir_view">
-                <property name="directories-only" bind-source="PfsFileSelector" bind-property="directory" bind-flags="sync-create"/>
-                <property name="folder" bind-source="PfsFileSelector" bind-property="current-folder" bind-flags="sync-create"/>
-                <property name="margin-start">6</property>
-                <property name="margin-end">6</property>
-                <signal name="new-uri" handler="on_new_uri" swapped="true"/>
-                <signal name="new-filename" handler="on_new_filename" swapped="true"/>
-              </object>
             </property>
           </object>
-        </property>
-        <property name="sheet">
-          <object class="AdwToolbarView">
-            <child type="top">
-              <object class="AdwHeaderBar"/>
-            </child>
-            <property name="content">
-              <object class="GtkScrolledWindow">
-                <property name="vscrollbar-policy">automatic</property>
-                <property name="hscrollbar-policy">never</property>
-                //<property name="propagate-natural-height">True</property>
-                <child>
-                  <object class="PfsPlacesBox" id="places_box">
-                    <property name="folder" bind-source="PfsFileSelector" bind-property="current-folder" bind-flags="sync-create"/>
-                    <signal name="new-uri" handler="on_new_uri" swapped="true"/>
-                  </object>
-                </child>
-              </object>
-            </property>
-          </object>
-        </property>
-        <property name="bottom-bar">
-          <object class="GtkBox">
-            <property name="orientation">vertical</property>
-            <child>
-              <object class="AdwClamp">
-                <property name="maximum-size">360</property>
-                <property name="child">
-                  <object class="GtkCenterBox">
-                    <binding name="visible">
-                      <closure type="gboolean" function="mode_to_filename_entry">
-                        <lookup name="mode">PfsFileSelector</lookup>
-                      </closure>
-                    </binding>
-                    <property name="height-request">46</property>
-                    <property name="start-widget">
-                      <object class="GtkLabel">
-                        <property name="label" translatable="yes">Name</property>
-                        <property name="halign">end</property>
-                        <property name="hexpand">True</property>
-                        <property name="margin-start">6</property>
-                        <property name="margin-end">6</property>
-                      </object>
-                    </property>
-                    <property name="center-widget">
-                      <object class="GtkEntry">
-                        <property name="valign">center</property>
-                        <property name="hexpand">True</property>
-                        <property name="activates-default">True</property>
-                        <property name="buffer">
-                          <object class="GtkEntryBuffer" id="filename_buffer">
-                            <property name="text" bind-source="PfsFileSelector" bind-property="filename"
-                                      bind-flags="sync-create|bidirectional"/>
-                          </object>
-                        </property>
-                      </object>
-                    </property>
-                  </object>
-                </property>
-              </object>
-            </child>
-            <child>
-              <object class="GtkSearchBar" id="search_bar">
-                <property name="key-capture-widget">PfsFileSelector</property>
-                <property name="child">
-                  <object class="GtkSearchEntry" id="search_entry">
-                    <property name="input-hints">no-emoji</property>
-                    <property name="input-purpose">terminal</property>
-                    <property name="placeholder-text" translatable="yes">Filename</property>
-                    <signal name="search-changed" handler="on_search_changed" swapped="true"/>
-                  </object>
-                </property>
-              </object>
-            </child>
-            <child>
-              <object class="GtkCenterBox">
-                <property name="height-request">46</property>
-                <property name="start-widget">
-                  <object class="PfsDirStack" id="dir_stack">
-                    <property name="folder" bind-source="PfsFileSelector" bind-property="current-folder" bind-flags="sync-create"/>
-                    <signal name="new-uri" handler="on_new_uri" swapped="true"/>
-                  </object>
-                </property>
-                <property name="center-widget">
-                  <object class="GtkBox">
-                    <property name="spacing">6</property>
-                    <child>
-                      <object class="GtkImage">
-                        <binding name="icon-name">
-                          <closure type="gchararray" function="folder_to_icon_name">
-                            <lookup name="current-folder">PfsFileSelector</lookup>
-                          </closure>
-                        </binding>
-                      </object>
-                    </child>
-                    <child>
-                      <object class="GtkLabel">
-                        <binding name="label">
-                          <closure type="gchararray" function="folder_to_label">
-                            <lookup name="current-folder">PfsFileSelector</lookup>
-                          </closure>
-                        </binding>
-                        <binding name="tooltip-text">
-                          <closure type="gchararray" function="folder_to_tooltip">
-                            <lookup name="current-folder">PfsFileSelector</lookup>
-                          </closure>
-                        </binding>
-                        <property name="ellipsize">end</property>
-                      </object>
-                    </child>
-                  </object>
-                </property>
-                <property name="end-widget">
-                  <object class="GtkBox">
-                    <property name="spacing">6</property>
-                    <child>
-                      <object class="GtkMenuButton" id="choices_menu_button">
-                        <property name="visible">False</property>>
-                        <property name="focus-on-click">False</property>
-                        <property name="halign">center</property>
-                        <property name="valign">center</property>
-                        <property name="icon-name">settings-symbolic</property>
-                      </object>
-                    </child>
-                    <child>
-                      <object class="GtkMenuButton">
-                        <binding name="visible">
-                          <closure type="gboolean" function="n_items_to_visible">
-                            <lookup name="filters">PfsFileSelector</lookup>
-                          </closure>
-                        </binding>
-                        <property name="focus-on-click">False</property>
-                        <property name="halign">center</property>
-                        <property name="valign">center</property>
-                        <property name="popover">
-                          <object class="GtkPopoverMenu" id="filters_popover">
-                            <binding name="menu-model">
-                              <closure type="GMenuModel" function="filters_to_menu_model">
-                                <lookup name="filters">PfsFileSelector</lookup>
-                              </closure>
-                            </binding>
-                          </object>
-                        </property>
-                        <property name="icon-name">funnel-symbolic</property>
-                      </object>
-                    </child>
-                    <child>
-                      <object class="GtkMenuButton">
-                        <property name="focus-on-click">False</property>
-                        <property name="halign">center</property>
-                        <property name="valign">center</property>
-                        <property name="popover">
-                          <object class="GtkPopoverMenu">
-                            <property name="menu-model">dir_view_menu</property>
-                          </object>
-                        </property>
-                        <property name="icon-name">view-list-symbolic</property>
-                      </object>
-                    </child>
-                  </object>
-                </property>
-                <style>
-                  <class name="toolbar"/>
-                </style>
-              </object>
-            </child>
-          </object>
-        </property>
+        </child>
       </object>
     </property>
     <signal name="close-request" handler="on_close_requested" swapped="true"/>

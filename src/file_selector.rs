@@ -61,6 +61,9 @@ pub mod imp {
         pub window_title: TemplateChild<adw::WindowTitle>,
 
         #[template_child]
+        pub toast_overlay: TemplateChild<adw::ToastOverlay>,
+
+        #[template_child]
         pub bottom_sheet: TemplateChild<adw::BottomSheet>,
 
         #[template_child]
@@ -667,6 +670,10 @@ impl FileSelector {
 
     pub fn select_item(&self, item: &gio::File) {
         self.imp().dir_view.select_item(item);
+    }
+
+    pub fn show_toast(&self, toast: adw::Toast) {
+        self.imp().toast_overlay.add_toast(toast);
     }
 }
 

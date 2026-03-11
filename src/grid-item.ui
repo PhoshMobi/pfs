@@ -32,9 +32,40 @@
                 <property name="wrap-mode">word-char</property>
               </object>
             </child>
+            <child>
+              <object class="GtkPopoverMenu" id="context_menu">
+                <property name="menu-model">context_menu_model</property>
+                <property name="autohide">True</property>
+                <property name="has-arrow">True</property>
+              </object>
+            </child>
           </object>
         </property>
       </object>
     </child>
+    <child>
+      <object class="GtkGestureLongPress">
+        <property name="touch-only">False</property>
+        <signal name="pressed" handler="on_long_press_pressed" swapped="yes"/>
+      </object>
+    </child>
+    <child>
+      <object class="GtkGestureClick">
+        <property name="button">3</property>
+        <signal name="pressed" handler="on_right_click_pressed" swapped="yes"/>
+      </object>
+    </child>
   </template>
+  <menu id="context_menu_model">
+    <section>
+      <item>
+        <attribute name="label" translatable="yes">Properties</attribute>
+        <attribute name="action">grid-item.show-property</attribute>
+      </item>
+      <item>
+        <attribute name="label" translatable="yes">Copy Name</attribute>
+        <attribute name="action">grid-item.copy-name</attribute>
+      </item>
+    </section>
+  </menu>
 </interface>
