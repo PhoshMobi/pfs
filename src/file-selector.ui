@@ -2,6 +2,49 @@
 <interface>
   <requires lib="gtk" version="4.0"/>
   <requires lib="libadwaita" version="1.0"/>
+  <menu id="dir_view_menu">
+    <section>
+      <attribute name="label" translatable="yes">Icon Size</attribute>
+      <attribute name="display-hint">inline-buttons</attribute>
+      <item>
+        <attribute name="custom">size-controls</attribute>
+      </item>
+    </section>
+    <section>
+      <item>
+        <!-- Translators: This is a sort order for files -->
+        <attribute name="label" translatable="yes">A-Z</attribute>
+        <attribute name="action">file-selector.sort</attribute>
+        <attribute name="target" type="(sb)">('name',false)</attribute>
+      </item>
+      <item>
+        <!-- Translators: This is a sort order for files -->
+        <attribute name="label" translatable="yes">Z-A</attribute>
+        <attribute name="action">file-selector.sort</attribute>
+        <attribute name="target" type="(sb)">('name',true)</attribute>
+      </item>
+    </section>
+    <section>
+      <item>
+        <!-- Translators: This is a sort order for files -->
+        <attribute name="label" translatable="yes">Last changed</attribute>
+        <attribute name="action">file-selector.sort</attribute>
+        <attribute name="target" type="(sb)">('mtime',true)</attribute>
+      </item>
+      <item>
+        <!-- Translators: This is a sort order for files -->
+        <attribute name="label" translatable="yes">First changed</attribute>
+        <attribute name="action">file-selector.sort</attribute>
+        <attribute name="target" type="(sb)">('mtime',false)</attribute>
+      </item>
+    </section>
+    <section>
+      <item>
+        <attribute name="label" translatable="yes">Show _Hidden Files</attribute>
+        <attribute name="action">file-selector.show-hidden-files</attribute>
+      </item>
+    </section>
+  </menu>
   <template class="PfsFileSelector" parent="AdwWindow">
     <property name="default-width">360</property>
     <property name="default-height">576</property>
@@ -231,6 +274,35 @@
                             <property name="popover">
                               <object class="GtkPopoverMenu">
                                 <property name="menu-model">dir_view_menu</property>
+                                <child type="size-controls">
+                                  <object class="GtkBox">
+                                    <property name="orientation">horizontal</property>
+                                    <property name="spacing">2</property>
+                                    <property name="margin-start">10</property>
+                                    <child>
+                                      <object class="GtkButton">
+                                        <property name="icon-name">zoom-out-symbolic</property>
+                                        <property name="action-name">file-selector.decrease-icon-size</property>
+                                        <property name="width-request">44</property>
+                                        <property name="height-request">44</property>
+                                        <style>
+                                          <class name="flat"/>
+                                        </style>
+                                      </object>
+                                    </child>
+                                    <child>
+                                      <object class="GtkButton">
+                                        <property name="icon-name">zoom-in-symbolic</property>
+                                        <property name="action-name">file-selector.increase-icon-size</property>
+                                        <property name="width-request">44</property>
+                                        <property name="height-request">44</property>
+                                        <style>
+                                          <class name="flat"/>
+                                        </style>
+                                      </object>
+                                    </child>
+                                  </object>
+                                </child>
                               </object>
                             </property>
                             <property name="icon-name">view-list-symbolic</property>
@@ -254,42 +326,4 @@
       <class name="pfs-file-selector"/>
     </style>
   </template>
-  <interface>
-    <menu id="dir_view_menu">
-      <section>
-        <item>
-          <!-- Translators: This is a sort order for files -->
-          <attribute name="label" translatable="yes">A-Z</attribute>
-          <attribute name="action">file-selector.sort</attribute>
-          <attribute name="target" type="(sb)">('name',false)</attribute>
-        </item>
-        <item>
-          <!-- Translators: This is a sort order for files -->
-          <attribute name="label" translatable="yes">Z-A</attribute>
-          <attribute name="action">file-selector.sort</attribute>
-          <attribute name="target" type="(sb)">('name',true)</attribute>
-        </item>
-      </section>
-      <section>
-        <item>
-          <!-- Translators: This is a sort order for files -->
-          <attribute name="label" translatable="yes">Last changed</attribute>
-          <attribute name="action">file-selector.sort</attribute>
-          <attribute name="target" type="(sb)">('mtime',true)</attribute>
-        </item>
-        <item>
-          <!-- Translators: This is a sort order for files -->
-          <attribute name="label" translatable="yes">First changed</attribute>
-          <attribute name="action">file-selector.sort</attribute>
-          <attribute name="target" type="(sb)">('mtime',false)</attribute>
-        </item>
-      </section>
-      <section>
-        <item>
-          <attribute name="label" translatable="yes">Show _Hidden Files</attribute>
-          <attribute name="action">file-selector.show-hidden-files</attribute>
-        </item>
-      </section>
-    </menu>
-  </interface>
 </interface>

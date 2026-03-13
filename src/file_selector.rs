@@ -19,6 +19,10 @@ use crate::{
     stateful_action, util,
 };
 
+const ICON_SIZES: &[u32] = &[32, 48, 64, 96, 128, 256];
+const ICON_SIZE_MIN: u32 = ICON_SIZES[0];
+const ICON_SIZE_MAX: u32 = ICON_SIZES[ICON_SIZES.len() - 1];
+
 #[derive(Debug, Copy, Clone, Default, PartialEq, gio::glib::Enum)]
 #[enum_type(name = "PfsFileSelectorMode")]
 pub enum FileSelectorMode {
@@ -529,6 +533,50 @@ impl FileSelector {
         self.imp().dir_view.get().set_sorting(m, reversed);
     }
 
+    fn update_icon_size_action_sensitivity(&self) {
+        let settings_binding = self.imp().settings.borrow();
+        if let Some(settings) = settings_binding.as_ref() {
+            let current_size = settings.uint("icon-size");
+            self.action_set_enabled(
+                "file-selector.increase-icon-size",
+                current_size < ICON_SIZE_MAX,
+            );
+            self.action_set_enabled(
+                "file-selector.decrease-icon-size",
+                current_size > ICON_SIZE_MIN,
+            );
+        }
+    }
+
+    fn change_icon_size(&self, increase: bool) {
+        let settings_binding = self.imp().settings.borrow();
+
+        if let Some(settings) = settings_binding.as_ref() {
+            let current_size = settings.uint("icon-size");
+
+            let new_size = if increase {
+                ICON_SIZES
+                    .iter()
+                    .copied()
+                    .find(|s| *s > current_size)
+                    .unwrap_or(ICON_SIZE_MAX)
+            } else {
+                ICON_SIZES
+                    .iter()
+                    .rev()
+                    .copied()
+                    .find(|s| *s < current_size)
+                    .unwrap_or(ICON_SIZE_MIN)
+            };
+
+            if new_size != current_size {
+                glib::g_debug!(LOG_DOMAIN, "Icon size changed to {new_size}");
+                let _ = settings.set_uint("icon-size", new_size);
+                self.update_icon_size_action_sensitivity();
+            }
+        }
+    }
+
     fn setup_gactions(&self) {
         let actions = gio::SimpleActionGroup::new();
         stateful_action!(
@@ -614,6 +662,22 @@ impl FileSelector {
                 Some(state.parse::<u32>().unwrap())
             })
             .build();
+
+        // Control icon-size actions
+        for (name, inc) in [("increase-icon-size", true), ("decrease-icon-size", false)] {
+            stateful_action!(
+                actions,
+                name,
+                false,
+                glib::clone!(
+                    #[weak(rename_to = this)]
+                    self,
+                    move |_, _| this.change_icon_size(inc)
+                )
+            );
+        }
+
+        self.update_icon_size_action_sensitivity();
     }
 
     fn confirm_overwrite(&self, file: &gio::File) {
