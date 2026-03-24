@@ -79,11 +79,12 @@ pub mod imp {
         #[template_child]
         pub search_entry: TemplateChild<gtk::SearchEntry>,
 
-        done: Cell<bool>,
-
         pub(super) choices_actions: RefCell<Option<gio::SimpleActionGroup>>,
 
         pub(super) settings: RefCell<Option<gio::Settings>>,
+
+        #[property(set, get)]
+        pub done: Cell<bool>,
 
         //
         // Properties mapping to the portal spec
@@ -187,14 +188,16 @@ pub mod imp {
     #[gtk::template_callbacks]
     impl FileSelector {
         pub(super) fn send_done(&self, success: bool, close: bool) {
-            if !self.done.get() {
+            let obj = self.obj();
+
+            if !obj.done() {
                 glib::g_debug!(LOG_DOMAIN, "Done, success: {success:#?}");
-                self.obj().emit_by_name::<()>("done", &[&success]);
-                self.done.replace(true);
+                obj.set_done(true);
+                obj.emit_by_name::<()>("done", &[&success]);
             }
 
             if close && self.close_on_done.get() {
-                self.obj().close();
+                obj.close();
             }
         }
 
