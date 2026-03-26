@@ -11,9 +11,7 @@ use adw::subclass::prelude::*;
 use glib::subclass::Signal;
 use glib::translate::*;
 use glib::Object;
-use glib_macros::Properties;
 use gtk::{gio, glib, CompositeTemplate};
-use std::cell::RefCell;
 use std::sync::OnceLock;
 
 use crate::{config::LOG_DOMAIN, places_item::PlacesItem, util};
@@ -21,16 +19,11 @@ use crate::{config::LOG_DOMAIN, places_item::PlacesItem, util};
 mod imp {
     use super::*;
 
-    #[derive(Debug, Default, CompositeTemplate, Properties)]
+    #[derive(Debug, Default, CompositeTemplate)]
     #[template(resource = "/mobi/phosh/FileSelector/places-box.ui")]
-    #[properties(wrapper_type = super::PlacesBox)]
     pub struct PlacesBox {
         #[template_child]
         pub flow_box: TemplateChild<gtk::FlowBox>,
-
-        // The folder to track
-        #[property(get, set)]
-        pub folder: RefCell<Option<gio::File>>,
     }
 
     #[glib::object_subclass]
@@ -49,7 +42,6 @@ mod imp {
         }
     }
 
-    #[glib::derived_properties]
     impl ObjectImpl for PlacesBox {
         fn constructed(&self) {
             self.parent_constructed();

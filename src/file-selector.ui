@@ -143,7 +143,6 @@
                             <property name="title" translatable="yes">Places</property>
                             <property name="child">
                               <object class="PfsPlacesBox" id="places_box">
-                                <property name="folder" bind-source="PfsFileSelector" bind-property="current-folder" bind-flags="sync-create"/>
                                 <signal name="new-uri" handler="on_new_uri" swapped="true"/>
                               </object>
                             </property>
