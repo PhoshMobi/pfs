@@ -1,3 +1,53 @@
+pfs (0.0.8) experimental; urgency=medium
+
+  [ Arun Mani J ]
+  * tree: Update to `gtk` 0.11
+  * ci: Install Clippy from `rustup`
+  * ci: Install `rustc` from `experimental`
+
+  [ Guido Günther ]
+  * ci: Use rust versions consistently.
+    No need to pull from experimental anymore or to
+    fall back to rustup.
+
+  [ Gotam Gorabh ]
+  * file-selector: Drop invalid XML syntax
+  * file-selector: Add toast overlay to file selector.
+    Wrap content with `AdwToastOverlay` and add `show_toast()` method
+    to enable toast notifications.
+  * grid-item: Add long-press context menu.
+    Add long-press context menu with two actions:
+    - Properties: Opens `FileProps` dialog to display file information
+    - Copy Filename: Copies filename to clipboard
+    The long-press gesture is only enabled in `OpenFile` mode.
+    Closes: https://gitlab.gnome.org/World/Phosh/pfs/-/issues/17
+  * file-selector: Move menu at top.
+    This is preparation for upcoming commits. Adding custom
+    elements needs the menu-model to exist already.
+  * file-selector: Allow to change icon size.
+    Closes: https://gitlab.gnome.org/World/Phosh/pfs/-/issues/10
+
+  [ Ryo Nakano ]
+  * po: Add Japanese translation
+
+  [ OlesyaGerasimenko ]
+  * po: Add Russian translation
+
+  [ Rudra Pratap Singh ]
+  * file-selector: Add done as property.
+    Then allows done to be emitted for each
+    successful operation, which can be useful
+    for e.g., opening multiple files.
+  * pfs-open: Keep open after launching an item.
+    As PfsOpenApplication is an AdwApplication,
+    we can set FileSelector as the main window for
+    it which will keep the app running and allow
+    to get rid of app holds/releases whenever an
+    item is launched or error dialog shown.
+    Closes: https://gitlab.gnome.org/World/Phosh/pfs/-/issues/18
+
+ -- Guido Günther <agx@sigxcpu.org>  Thu, 26 Mar 2026 17:59:58 +0100
+
 pfs (0.0.7) experimental; urgency=medium
 
   * treewide: Drop some superfluous semicolons
