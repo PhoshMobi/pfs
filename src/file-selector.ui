@@ -130,9 +130,26 @@
                   <object class="GtkBox">
                     <property name="orientation">vertical</property>
                     <child>
+                      <object class="AdwInlineViewSwitcher">
+                        <property name="stack">view_stack</property>
+                        <property name="homogeneous">1</property>
+                        <property name="halign">center</property>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="AdwViewStack" id="view_stack">
+                        <child>
+                          <object class="AdwViewStackPage">
+                            <property name="name">places</property>
+                            <property name="title" translatable="yes">Places</property>
+                            <property name="child">
                       <object class="PfsPlacesBox" id="places_box">
                         <property name="folder" bind-source="PfsFileSelector" bind-property="current-folder" bind-flags="sync-create"/>
                         <signal name="new-uri" handler="on_new_uri" swapped="true"/>
+                      </object>
+                            </property>
+                          </object>
+                        </child>
                       </object>
                     </child>
                     <child>
