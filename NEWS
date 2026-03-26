@@ -1,3 +1,22 @@
+pfs 0.0.8
+---------
+Released March 2026
+* Add long press context menu for file properties / copy
+* Keep pfs-open after opening a file
+* Allow to change icon size
+* Issues fixed:
+    * https://gitlab.gnome.org/World/Phosh/pfs/-/issues/17
+    * https://gitlab.gnome.org/World/Phosh/pfs/-/issues/10
+    * https://gitlab.gnome.org/World/Phosh/pfs/-/issues/18
+* Contributors:
+    * Arun Mani J
+    * Gotam Gorabh
+    * Guido Günther
+    * Rudra Pratap Singh
+* UI translations:
+    * OlesyaGerasimenko (ru)
+    * Ryo Nakano (ja)
+
 pfs 0.0.7
 ---------
 Released February 2026

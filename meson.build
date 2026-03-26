@@ -1,7 +1,7 @@
 project(
   'PhoshFileSelector',
   ['rust', 'c'],
-  version: '0.0.7',
+  version: '0.0.8',
   meson_version: '>= 1.1.0',
   default_options: ['warning_level=2', 'werror=false'],
 )
