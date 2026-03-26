@@ -16,12 +16,6 @@
             <signal name="child-activated" handler="on_item_activated" swapped="true"/>
           </object>
         </child>
-        <child>
-          <object class="PfsPathBar" id="path_bar">
-            <property name="folder" bind-source="PfsPlacesBox" bind-property="folder" bind-flags="sync-create"/>
-            <signal name="new-uri" handler="on_new_uri" swapped="true"/>
-          </object>
-        </child>
       </object>
     </property>
   </template>
