@@ -10,7 +10,7 @@ use adw::prelude::*;
 use adw::subclass::prelude::*;
 use glib_macros::clone;
 use gtk::{gdk, gio, glib};
-use std::cell::{Cell, RefCell};
+use std::cell::RefCell;
 
 use pfs::file_props::FileProps;
 use pfs::file_selector::{FileSelector, FileSelectorMode};
@@ -92,8 +92,6 @@ mod imp {
 
     #[derive(Debug, Default)]
     pub struct PfsOpenApplication {
-        pub hold_guard: RefCell<Option<gio::ApplicationHoldGuard>>,
-        pub hold_count: Cell<u32>,
         registration_id: RefCell<Option<gio::RegistrationId>>,
         owner_id: RefCell<Option<gio::OwnerId>>,
     }
@@ -108,8 +106,6 @@ mod imp {
     impl ObjectImpl for PfsOpenApplication {
         fn constructed(&self) {
             self.parent_constructed();
-
-            self.hold_count.set(0);
         }
     }
 
@@ -196,24 +192,6 @@ impl PfsOpenApplication {
             .build()
     }
 
-    fn app_release(&self) {
-        let imp = self.imp();
-
-        if imp.hold_count.replace(imp.hold_count.get() - 1) == 1 {
-            // Drop the gapplication ref count
-            self.imp().hold_guard.replace(None);
-        }
-    }
-
-    fn app_hold(&self) {
-        let imp = self.imp();
-
-        if imp.hold_count.replace(imp.hold_count.get() + 1) == 0 {
-            // Bump the gapplication ref count
-            *self.imp().hold_guard.borrow_mut() = Some(self.hold());
-        }
-    }
-
     fn show_open_error(&self, parent: &FileSelector, err_msg: &str) {
         let dialog = adw::AlertDialog::new(
             Some(&gettextrs::gettext("Error opening file")),
@@ -222,24 +200,12 @@ impl PfsOpenApplication {
 
         dialog.add_response("ok", &gettextrs::gettext("Ok"));
 
-        self.app_hold();
-        dialog.choose(
-            Some(parent),
-            None::<&gio::Cancellable>,
-            clone!(
-                #[weak(rename_to = this)]
-                self,
-                move |_response| {
-                    this.app_release();
-                }
-            ),
-        );
+        dialog.choose(Some(parent), None::<&gio::Cancellable>, |_response| {});
     }
 
     fn launch_for_uri(&self, uri: &str, parent: &FileSelector) {
         let ctx = gdk::Display::default().map(|d| d.app_launch_context());
 
-        self.app_hold();
         gio::AppInfo::launch_default_for_uri_async(
             uri,
             ctx.as_ref(),
@@ -258,7 +224,6 @@ impl PfsOpenApplication {
                     } else {
                         glib::g_debug!(LOG_DOMAIN, "Launched {uri}");
                     }
-                    this.app_release();
                 },
             ),
         );
@@ -296,14 +261,17 @@ impl PfsOpenApplication {
                             this.show_open_error(&selector, "Nothing selected");
                         }
                     }
-                    this.app_release();
+
+                    selector.set_done(false);
                 }
             ),
         );
 
-        self.app_hold();
         file_selector.set_mode(FileSelectorMode::OpenFile);
         file_selector.present();
+
+        let app = self.upcast_ref::<gtk::Application>();
+        app.add_window(file_selector.upcast_ref::<gtk::Window>());
 
         file_selector
     }
@@ -320,8 +288,6 @@ impl PfsOpenApplication {
 
         glib::g_message!(LOG_DOMAIN, "Showing props for {uri}");
 
-        self.app_hold();
-
         let file_props = glib::Object::builder::<FileProps>()
             .property("file", file)
             .build();
@@ -329,16 +295,13 @@ impl PfsOpenApplication {
         file_props.connect_closure(
             "done",
             false,
-            glib::closure_local!(
-                #[weak(rename_to = this)]
-                self,
-                move |_props: FileProps, success: bool| {
-                    glib::g_debug!(LOG_DOMAIN, "File props dialog done, result: {success}");
-
-                    this.app_release();
-                }
-            ),
+            glib::closure_local!(move |_props: FileProps, success: bool| {
+                glib::g_debug!(LOG_DOMAIN, "File props dialog done, result: {success}");
+            }),
         );
+
+        let app = self.upcast_ref::<gtk::Application>();
+        app.add_window(file_props.upcast_ref::<gtk::Window>());
 
         file_props.present();
     }
