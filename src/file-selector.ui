@@ -130,17 +130,10 @@
                   <object class="GtkBox">
                     <property name="orientation">vertical</property>
                     <child>
-                  <object class="GtkScrolledWindow">
-                    <property name="vscrollbar-policy">automatic</property>
-                    <property name="hscrollbar-policy">never</property>
-                    <property name="propagate-natural-height">True</property>
-                    <child>
                       <object class="PfsPlacesBox" id="places_box">
                         <property name="folder" bind-source="PfsFileSelector" bind-property="current-folder" bind-flags="sync-create"/>
                         <signal name="new-uri" handler="on_new_uri" swapped="true"/>
                       </object>
-                    </child>
-                  </object>
                     </child>
                     <child>
                       <object class="PfsPathBar" id="path_bar">
