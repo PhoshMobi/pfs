@@ -10,6 +10,7 @@ pub mod file_props;
 pub mod file_selector;
 pub mod init;
 
+mod bookmarks_box;
 mod bookmarks_item;
 mod config;
 mod dir_stack;

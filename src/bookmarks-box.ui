@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<interface>
+  <requires lib="gtk" version="4.0"/>
+  <requires lib="libadwaita" version="1.0"/>
+  <template class="PfsBookmarksBox" parent="AdwBin">
+    <property name="child">
+      <object class="GtkScrolledWindow">
+        <property name="vscrollbar-policy">automatic</property>
+        <property name="hscrollbar-policy">never</property>
+        <property name="propagate-natural-height">True</property>
+        <child>
+          <object class="GtkStack" id="stack">
+            <child>
+              <object class="GtkStackPage">
+                <property name="name">placeholder</property>
+                <property name="child">
+                  <object class="AdwStatusPage">
+                    <property name="title" translatable="yes">No bookmarks found</property>
+                    <property name="description" translatable="yes">Add a bookmark to show here.</property>
+                    <property name="icon-name">user-bookmarks-symbolic</property>
+                    <style>
+                      <class name="compact"/>
+                    </style>
+                  </object>
+                </property>
+              </object>
+            </child>
+            <child>
+              <object class="GtkStackPage">
+                <property name="name">flow_box</property>
+                <property name="child">
+                  <object class="GtkFlowBox" id="flow_box">
+                    <property name="valign">end</property>
+                    <property name="selection-mode">none</property>
+                    <property name="margin-top">6</property>
+                    <property name="margin-bottom">6</property>
+                    <property name="margin-start">6</property>
+                    <property name="margin-end">6</property>
+                    <signal name="child-activated" handler="on_item_activated" swapped="true"/>
+                  </object>
+                </property>
+              </object>
+            </child>
+          </object>
+        </child>
+      </object>
+    </property>
+  </template>
+</interface>
