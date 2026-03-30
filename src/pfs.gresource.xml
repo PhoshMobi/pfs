@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <gresources>
   <gresource prefix="/mobi/phosh/FileSelector">
+    <file preprocess="xml-stripblanks">bookmarks-item.ui</file>
     <file preprocess="xml-stripblanks">dir-stack.ui</file>
     <file preprocess="xml-stripblanks">dir-view.ui</file>
     <file preprocess="xml-stripblanks">file-props.ui</file>
