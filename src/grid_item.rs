@@ -32,6 +32,9 @@ mod imp {
         #[template_child]
         pub context_menu: TemplateChild<gtk::PopoverMenu>,
 
+        #[template_child]
+        pub context_menu_model: TemplateChild<gio::Menu>,
+
         #[property(get, set = Self::set_fileinfo)]
         pub fileinfo: RefCell<Option<gio::FileInfo>>,
 
@@ -57,6 +60,12 @@ mod imp {
             });
             klass.install_action("grid-item.copy-name", None, move |item, _, _| {
                 item.copy_to_clipboard();
+            });
+            klass.install_action("grid-item.add-bookmark", None, move |item, _, _| {
+                item.add_bookmark();
+            });
+            klass.install_action("grid-item.del-bookmark", None, move |item, _, _| {
+                item.del_bookmark();
             });
         }
 
@@ -194,14 +203,65 @@ impl GridItem {
         self.get_file_selector().show_toast(toast);
     }
 
+    fn add_bookmark(&self) {
+        let file = self.get_file();
+        let uri = file.uri();
+        let file_selector = self.get_file_selector();
+
+        file_selector.add_bookmark(&uri);
+
+        let toast_message = gettextrs::gettext("Added to bookmarks");
+        let toast = adw::Toast::builder()
+            .title(&toast_message)
+            .timeout(2)
+            .build();
+
+        file_selector.show_toast(toast);
+    }
+
+    fn del_bookmark(&self) {
+        let file = self.get_file();
+        let uri = file.uri();
+        let file_selector = self.get_file_selector();
+
+        file_selector.del_bookmark(&uri);
+
+        let toast_message = gettextrs::gettext("Removed from bookmarks");
+        let toast = adw::Toast::builder()
+            .title(&toast_message)
+            .timeout(2)
+            .build();
+
+        file_selector.show_toast(toast);
+    }
+
     fn show_context_menu(&self, x: f64, y: f64) {
+        let fs = self.get_file_selector();
+
         // Disable context menu when used as portal
-        if self.get_file_selector().close_on_done() {
+        if fs.close_on_done() {
             return;
         }
 
         let imp = self.imp();
         let popover = &imp.context_menu;
+
+        let fileinfo = imp.fileinfo.borrow();
+        let info = fileinfo.as_ref().unwrap();
+        let file = self.get_file();
+        let uri = file.uri();
+
+        let mut add_bookmark = false;
+        let mut del_bookmark = false;
+        if fs.is_bookmarks_available() && info.file_type() == gio::FileType::Directory {
+            if fs.is_bookmark(&uri) {
+                del_bookmark = true;
+            } else {
+                add_bookmark = true;
+            }
+        }
+        self.action_set_enabled("grid-item.add-bookmark", add_bookmark);
+        self.action_set_enabled("grid-item.del-bookmark", del_bookmark);
 
         popover.unparent();
         popover.set_parent(self);

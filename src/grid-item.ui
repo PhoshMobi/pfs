@@ -65,5 +65,15 @@
       <attribute name="label" translatable="yes">Copy Name</attribute>
       <attribute name="action">grid-item.copy-name</attribute>
     </item>
+    <item>
+      <attribute name="label" translatable="yes">Add to bookmarks</attribute>
+      <attribute name="action">grid-item.add-bookmark</attribute>
+      <attribute name="hidden-when">action-disabled</attribute>
+    </item>
+    <item>
+      <attribute name="label" translatable="yes">Remove from bookmarks</attribute>
+      <attribute name="action">grid-item.del-bookmark</attribute>
+      <attribute name="hidden-when">action-disabled</attribute>
+    </item>
   </menu>
 </interface>
