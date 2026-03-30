@@ -157,17 +157,18 @@ impl GridItem {
             .expect("FileSelector must be at the root")
     }
 
-    fn show_properties(&self) {
+    fn get_file(&self) -> gio::File {
         let imp = self.imp();
-
         let fileinfo = imp.fileinfo.borrow();
         let info = fileinfo.as_ref().unwrap();
-        let file = info
-            .attribute_object("standard::file")
+        info.attribute_object("standard::file")
             .unwrap()
             .downcast::<gio::File>()
-            .unwrap();
+            .unwrap()
+    }
 
+    fn show_properties(&self) {
+        let file = self.get_file();
         let uri = file.uri();
         glib::g_debug!(LOG_DOMAIN, "Showing properties for {uri}");
 
