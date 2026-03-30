@@ -148,6 +148,17 @@
                             </property>
                           </object>
                         </child>
+                        <child>
+                          <object class="AdwViewStackPage">
+                            <property name="name">bookmarks</property>
+                            <property name="title" translatable="yes">Bookmarks</property>
+                            <property name="child">
+                              <object class="PfsBookmarksBox" id="bookmarks_box">
+                                <signal name="new-uri" handler="on_new_uri" swapped="true"/>
+                              </object>
+                            </property>
+                          </object>
+                        </child>
                       </object>
                     </child>
                     <child>

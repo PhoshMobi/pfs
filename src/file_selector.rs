@@ -35,6 +35,7 @@ use std::cell::{Cell, RefCell};
 use std::sync::OnceLock;
 
 use crate::{
+    bookmarks_box::BookmarksBox,
     config::LOG_DOMAIN,
     dir_stack::DirStack,
     dir_view::DirView,
@@ -86,6 +87,9 @@ pub mod imp {
     pub struct FileSelector {
         #[template_child]
         pub dir_view: TemplateChild<DirView>,
+
+        #[template_child]
+        pub bookmarks_box: TemplateChild<BookmarksBox>,
 
         #[template_child]
         pub places_box: TemplateChild<PlacesBox>,
