@@ -6,6 +6,12 @@
  * Author: Guido Günther <agx@sigxcpu.org>
  */
 
+//! Library initialization for pfs.
+//!
+//! This module provides the [`init`] function which must be called before
+//! using any pfs widgets. For C consumers, [`pfs_init`] provides the same
+//! functionality.
+
 use gettextrs::{bind_textdomain_codeset, bindtextdomain};
 use gtk::{gdk, gio};
 use std::sync::atomic::{AtomicBool, Ordering};
@@ -14,6 +20,34 @@ use crate::config::{GETTEXT_PACKAGE, LOCALEDIR};
 
 static INITIALIZED: AtomicBool = AtomicBool::new(false);
 
+/// Initializes the pfs library.
+///
+/// This function must be called before using any pfs widgets. It performs
+/// the following setup:
+///
+/// - Initializes GTK4
+/// - Binds the gettext text domain for translations
+/// - Registers GResource files (UI templates, icons, CSS)
+/// - Adds the icon theme resource path
+/// - Loads and applies the pfs CSS stylesheet
+///
+/// # Panics
+///
+/// Panics if:
+/// - The text domain cannot be bound
+/// - GResource registration fails
+/// - No default GDK display is available
+///
+/// # Example
+///
+/// ```no_run
+/// use gtk::prelude::*;
+///
+/// pfs::init::init();
+///
+/// let selector = pfs::file_selector::FileSelector::new();
+/// selector.present();
+/// ```
 pub fn init() {
     if INITIALIZED.load(Ordering::Acquire) {
         return;

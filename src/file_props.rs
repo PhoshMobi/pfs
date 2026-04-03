@@ -6,6 +6,12 @@
  * Author: Guido Günther <agx@sigxcpu.org>
  */
 
+//! File properties dialog.
+//!
+//! This module provides [`FileProps`], a dialog window that displays
+//! metadata about a file or directory, including size, timestamps,
+//! content type, and thumbnail preview.
+
 use adw::{prelude::*, subclass::prelude::*};
 use glib::subclass::Signal;
 use glib::translate::*;
@@ -16,15 +22,19 @@ use std::sync::OnceLock;
 
 use crate::{config::LOG_DOMAIN, file_selector::FileSelector, file_selector::FileSelectorMode};
 
+/// The type of filesystem entry being displayed in [`FileProps`].
 #[derive(Debug, Copy, Clone, Default, PartialEq, gio::glib::Enum)]
 #[enum_type(name = "PfsFilePropsType")]
 pub enum FilePropsType {
+    /// A regular file.
     #[default]
     File,
+    /// A directory.
     Directory,
     //TODO: MountPoint,
 }
 
+/// Implementation details for [`FileProps`].
 pub mod imp {
     use super::*;
 
@@ -144,10 +154,27 @@ impl Default for FileProps {
 
 #[gtk::template_callbacks]
 impl FileProps {
+    /// Creates a new `FileProps` dialog.
+    ///
+    /// To display properties for a specific file, use [`FileProps::builder`]
+    /// to set the `file` property at construction time.
     pub fn new() -> Self {
         Self::default()
     }
 
+    /// Creates a new builder-pattern struct instance to construct [`FileProps`] objects.
+    ///
+    /// This method returns an instance of [`FilePropsBuilder`] which can be used to create [`FileProps`] objects.
+    ///
+    /// ```no_run
+    /// use gtk::gio;
+    /// use pfs::file_props::FileProps;
+    ///
+    /// let file = gio::File::for_path("/path/to/file");
+    /// let props = FileProps::builder()
+    ///     .file(&file)
+    ///     .build();
+    /// ```
     pub fn builder() -> FilePropsBuilder {
         FilePropsBuilder::new()
     }
@@ -334,6 +361,7 @@ impl FileProps {
     }
 }
 
+/// A [builder-pattern] type to construct [`FileProps`] objects.
 pub struct FilePropsBuilder {
     builder: glib::object::ObjectBuilder<'static, FileProps>,
 }
@@ -345,17 +373,20 @@ impl Default for FilePropsBuilder {
 }
 
 impl FilePropsBuilder {
+    /// Creates a new [`FilePropsBuilder`].
     pub fn new() -> Self {
         Self {
             builder: glib::Object::builder(),
         }
     }
 
+    /// Sets the `file` property for which we show the info
     pub fn file(mut self, file: &gio::File) -> Self {
         self.builder = self.builder.property("file", file);
         self
     }
 
+    /// Build the [`FileProps`].
     pub fn build(self) -> FileProps {
         self.builder.build()
     }
