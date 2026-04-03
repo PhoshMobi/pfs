@@ -11,6 +11,7 @@ stages:
  - test+docs
  - style-checks
  - package
+ - deploy
 
 default:
   # Protect CI infra from rogue jobs
@@ -62,6 +63,19 @@ build:
   artifacts:
     paths:
       - _build
+
+build-doc:
+  stage: test+docs
+  image: ${DEBIAN_IMAGE}
+  needs: [build]
+  variables:
+    PHOSH_ADDITIONAL_SID_PKGS: $SID_PKGS
+  <<: *common_before_script
+  script:
+    - CARGO_HOME=_build/cargo PFS_RESOURCE_DIR=$PWD/_build/src cargo doc --no-deps --lib
+  artifacts:
+    paths:
+      - target/doc
 
 build-lib:
   stage: build
@@ -147,3 +161,14 @@ package-deb-debian-forky:
     DEB_BUILD_PROFILES:
     PHOSH_ADDITIONAL_SID_PKGS: $SID_PKGS
   extends: .phosh-build-debian-package
+
+pages:
+  stage: deploy
+  needs: [build-doc]
+  script:
+    - mv target/doc public
+  artifacts:
+    paths:
+      - public
+  rules:
+    - if: '$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
