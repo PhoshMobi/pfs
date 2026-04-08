@@ -16,7 +16,7 @@
                 <property name="child">
                   <object class="GtkGridView" id="grid_view">
                     <property name="factory">item_factory</property>
-                    <property name="model">single_selection</property>
+                    <property name="model">selection_model</property>
                     <signal name="activate" handler="on_activate" swapped="true"/>
                   </object>
                 </property>
@@ -77,7 +77,7 @@
   <object class="GtkSortListModel" id="sorted_list">
     <property name="model">filtered_list</property>
   </object>
-  <object class="GtkSingleSelection" id="single_selection">
+  <object class="GtkSingleSelection" id="selection_model">
     <property name="model">sorted_list</property>
     <property name="autoselect">False</property>
     <signal name="selection-changed" handler="on_selection_changed" swapped="true"/>

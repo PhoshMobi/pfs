@@ -67,7 +67,7 @@ mod imp {
         pub filtered_list: TemplateChild<gtk::FilterListModel>,
 
         #[template_child]
-        pub single_selection: TemplateChild<gtk::SingleSelection>,
+        pub selection_model: TemplateChild<gtk::SelectionModel>,
 
         #[template_child]
         pub item_factory: TemplateChild<gtk::SignalListItemFactory>,
@@ -570,8 +570,12 @@ impl DirView {
     fn on_selection_changed(&self, position: u32, n_items: u32) {
         glib::g_debug!(LOG_DOMAIN, "Selection changed {position:#?} {n_items:#?}");
 
-        let selection = self.imp().single_selection.get();
-        let selected_item = selection.selected_item();
+        let bitset = self.imp().selection_model.selection();
+        let selected_item = if bitset.is_empty() {
+            None
+        } else {
+            self.imp().selection_model.item(bitset.nth(0))
+        };
         let mut is_selected = false;
 
         if let Some(info) = selected_item {
@@ -611,7 +615,7 @@ impl DirView {
     fn on_activate(&self, pos: u32) {
         glib::g_debug!(LOG_DOMAIN, "Item Activated {pos:#?}");
 
-        self.imp().single_selection.set_selected(pos);
+        self.imp().selection_model.select_item(pos, true);
         // Only accept when we have a selection
         if !self.has_selection() {
             return;
@@ -660,7 +664,11 @@ impl DirView {
                 Some(_) => vec![self.folder().unwrap().uri().to_string()],
             }
         } else {
-            let selected = self.imp().single_selection.get().selected_item();
+            let bitset = self.imp().selection_model.selection();
+            if bitset.is_empty() {
+                return None;
+            }
+            let selected = self.imp().selection_model.item(bitset.nth(0));
             let item = selected?;
 
             let file = item
@@ -839,7 +847,7 @@ impl DirView {
             imp.directory_list.disconnect(select_item_id);
         }
 
-        let model = imp.single_selection;
+        let model = imp.selection_model;
         let n_items = model.n_items();
 
         if n_items == 0 {
