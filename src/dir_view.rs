@@ -67,9 +67,6 @@ mod imp {
         pub filtered_list: TemplateChild<gtk::FilterListModel>,
 
         #[template_child]
-        pub selection_model: TemplateChild<gtk::SelectionModel>,
-
-        #[template_child]
         pub item_factory: TemplateChild<gtk::SignalListItemFactory>,
 
         // The folder to display
@@ -123,6 +120,7 @@ mod imp {
         #[property(get, set, builder(ThumbnailMode::default()))]
         pub thumbnail_mode: RefCell<ThumbnailMode>,
 
+        pub selection_model: RefCell<Option<gtk::SelectionModel>>,
         pub cancellable: RefCell<gio::Cancellable>,
         pub debounce_id: RefCell<Option<glib::SourceId>>,
         pub no_thumbnails: RefCell<HashMap<String, GridItem>>,
@@ -428,6 +426,19 @@ mod imp {
             self.parent_constructed();
             let obj = self.obj();
 
+            let selection_model = gtk::SingleSelection::builder()
+                .model(&self.sorted_list.get())
+                .autoselect(false)
+                .build();
+            selection_model.connect_selection_changed(glib::clone!(
+                #[weak(rename_to = this)]
+                self,
+                move |_, position, n_items| this.obj().on_selection_changed(position, n_items)
+            ));
+            *self.selection_model.borrow_mut() = Some(selection_model.into());
+            let binding = self.selection_model.borrow();
+            self.grid_view.set_model(binding.as_ref());
+
             *self.cancellable.borrow_mut() = gio::Cancellable::new();
 
             gio::DBusProxy::for_bus(
@@ -566,15 +577,21 @@ impl DirView {
         *imp.debounce_id.borrow_mut() = Some(source_id);
     }
 
-    #[template_callback]
     fn on_selection_changed(&self, position: u32, n_items: u32) {
         glib::g_debug!(LOG_DOMAIN, "Selection changed {position:#?} {n_items:#?}");
 
-        let bitset = self.imp().selection_model.selection();
+        let bitset = self
+            .imp()
+            .selection_model
+            .borrow()
+            .as_ref()
+            .unwrap()
+            .selection();
         let selected_item = if bitset.is_empty() {
             None
         } else {
-            self.imp().selection_model.item(bitset.nth(0))
+            let binding = self.imp().selection_model.borrow();
+            binding.as_ref().unwrap().item(bitset.nth(0))
         };
         let mut is_selected = false;
 
@@ -585,9 +602,14 @@ impl DirView {
 
             if self.is_directory(fileinfo) {
                 let uri = file.uri();
-
-                glib::g_debug!(LOG_DOMAIN, "Should open {uri:#?}");
-                self.emit_by_name::<()>("new-uri", &[&uri]);
+                glib::source::idle_add_local_once(glib::clone!(
+                    #[weak(rename_to = this)]
+                    self,
+                    move || {
+                        glib::g_debug!(LOG_DOMAIN, "Should open {uri:#?}");
+                        this.emit_by_name::<()>("new-uri", &[&uri]);
+                    }
+                ));
             } else {
                 is_selected = true;
                 let filename = file.basename();
@@ -615,7 +637,8 @@ impl DirView {
     fn on_activate(&self, pos: u32) {
         glib::g_debug!(LOG_DOMAIN, "Item Activated {pos:#?}");
 
-        self.imp().selection_model.select_item(pos, true);
+        let binding = self.imp().selection_model.borrow();
+        binding.as_ref().unwrap().select_item(pos, true);
         // Only accept when we have a selection
         if !self.has_selection() {
             return;
@@ -664,11 +687,18 @@ impl DirView {
                 Some(_) => vec![self.folder().unwrap().uri().to_string()],
             }
         } else {
-            let bitset = self.imp().selection_model.selection();
+            let bitset = self
+                .imp()
+                .selection_model
+                .borrow()
+                .as_ref()
+                .unwrap()
+                .selection();
             if bitset.is_empty() {
                 return None;
             }
-            let selected = self.imp().selection_model.item(bitset.nth(0));
+            let binding = self.imp().selection_model.borrow();
+            let selected = binding.as_ref().unwrap().item(bitset.nth(0));
             let item = selected?;
 
             let file = item
@@ -847,7 +877,8 @@ impl DirView {
             imp.directory_list.disconnect(select_item_id);
         }
 
-        let model = imp.selection_model;
+        let binding = imp.selection_model.borrow();
+        let model = binding.as_ref().unwrap();
         let n_items = model.n_items();
 
         if n_items == 0 {

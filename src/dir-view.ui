@@ -16,7 +16,6 @@
                 <property name="child">
                   <object class="GtkGridView" id="grid_view">
                     <property name="factory">item_factory</property>
-                    <property name="model">selection_model</property>
                     <signal name="activate" handler="on_activate" swapped="true"/>
                   </object>
                 </property>
@@ -60,15 +59,13 @@
       </object>
     </property>
   </template>
-
   <object class="GtkDirectoryList" id="directory_list">
     <property name="attributes">standard::display-name,standard::icon,standard::content-type,standard::type,time::modified,thumbnail::*</property>
     <signal name="notify::loading" handler="on_loading_changed" swapped="true"/>
   </object>
   <object class="GtkFilterListModel" id="type_filtered_list">
     <property name="model">directory_list</property>
-    <property name="filter" bind-source="PfsDirView" bind-property="real-filter"
-              bind-flags="sync-create"/>
+    <property name="filter" bind-source="PfsDirView" bind-property="real-filter" bind-flags="sync-create"/>
   </object>
   <object class="GtkFilterListModel" id="filtered_list">
     <property name="model">type_filtered_list</property>
@@ -76,11 +73,6 @@
   </object>
   <object class="GtkSortListModel" id="sorted_list">
     <property name="model">filtered_list</property>
-  </object>
-  <object class="GtkSingleSelection" id="selection_model">
-    <property name="model">sorted_list</property>
-    <property name="autoselect">False</property>
-    <signal name="selection-changed" handler="on_selection_changed" swapped="true"/>
   </object>
   <object class="GtkSignalListItemFactory" id="item_factory">
     <signal name="setup" handler="on_item_setup" swapped="true"/>
