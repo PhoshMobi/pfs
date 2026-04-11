@@ -11,10 +11,10 @@ Build-Depends:
  libglib2.0-dev (>= 2.74),
  libgtk-4-dev (>= 4.12),
  meson,
- systemd-dev,
  patchelf,
  rustc (>= 1.92) <!pkg.pfs.rustup>,
  rustup <pkg.pfs.rustup>,
+ systemd-dev,
 Standards-Version: 4.6.2
 
 Package: pfs-utils
