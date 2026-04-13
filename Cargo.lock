@@ -7,7 +7,6 @@ name = "PhoshFileSelector"
 version = "0.0.8"
 dependencies = [
  "gettext-rs",
- "glib-macros 0.21.0",
  "gtk4",
  "libadwaita",
 ]
@@ -280,25 +279,12 @@ dependencies = [
  "futures-task",
  "futures-util",
  "gio-sys",
- "glib-macros 0.22.0",
+ "glib-macros",
  "glib-sys",
  "gobject-sys",
  "libc",
  "memchr",
  "smallvec",
-]
-
-[[package]]
-name = "glib-macros"
-version = "0.21.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e772291ebea14c28eb11bb75741f62f4a4894f25e60ce80100797b6b010ef0f9"
-dependencies = [
- "heck",
- "proc-macro-crate",
- "proc-macro2",
- "quote",
- "syn",
 ]
 
 [[package]]

@@ -15,7 +15,7 @@
 use adw::{prelude::*, subclass::prelude::*};
 use glib::subclass::Signal;
 use glib::translate::*;
-use glib_macros::{clone, Properties};
+use glib::Properties;
 use gtk::{gdk, gio, glib, CompositeTemplate};
 use std::cell::{Cell, RefCell};
 use std::sync::OnceLock;
@@ -276,7 +276,7 @@ impl FileProps {
         };
 
         self.clear_info();
-        let future = clone!(
+        let future = glib::clone!(
             #[weak(rename_to = this)]
             self,
             async move {

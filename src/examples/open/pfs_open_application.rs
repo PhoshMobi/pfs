@@ -8,7 +8,6 @@
 
 use adw::prelude::*;
 use adw::subclass::prelude::*;
-use glib_macros::clone;
 use gtk::{gdk, gio, glib};
 use std::cell::RefCell;
 
@@ -144,7 +143,7 @@ mod imp {
                 |_connection, name| {
                     glib::g_debug!(LOG_DOMAIN, "Owned {name} DBus name");
                 },
-                clone!(
+                glib::clone!(
                     #[weak(rename_to = this)]
                     self,
                     move |_connection, name| {
@@ -210,7 +209,7 @@ impl PfsOpenApplication {
             uri,
             ctx.as_ref(),
             None::<&gio::Cancellable>,
-            clone!(
+            glib::clone!(
                 #[weak(rename_to = this)]
                 self,
                 #[weak(rename_to = win)]

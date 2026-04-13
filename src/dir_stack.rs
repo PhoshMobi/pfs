@@ -9,7 +9,7 @@
 use adw::prelude::*;
 use adw::subclass::prelude::*;
 use glib::subclass::Signal;
-use glib_macros::Properties;
+use glib::Properties;
 use gtk::{gio, glib, CompositeTemplate};
 use std::cell::{Cell, RefCell};
 use std::sync::OnceLock;

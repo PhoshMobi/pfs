@@ -9,7 +9,7 @@
 use adw::prelude::*;
 use adw::subclass::prelude::*;
 use glib::subclass::Signal;
-use glib_macros::{clone, Properties};
+use glib::Properties;
 use gtk::{gio, glib, CompositeTemplate};
 use std::cell::{Cell, RefCell};
 use std::cmp::Ordering;
@@ -721,7 +721,7 @@ impl DirView {
     }
 
     fn setup_sort_and_filter(&self) {
-        let sorter = gtk::CustomSorter::new(clone!(
+        let sorter = gtk::CustomSorter::new(glib::clone!(
             #[weak(rename_to = this)]
             self,
             #[upgrade_or]
@@ -756,7 +756,7 @@ impl DirView {
         ));
         self.imp().sorted_list.set_sorter(Some(&sorter));
 
-        let custom_filter = gtk::CustomFilter::new(clone!(
+        let custom_filter = gtk::CustomFilter::new(glib::clone!(
             #[weak(rename_to = this)]
             self,
             #[upgrade_or]
@@ -876,7 +876,7 @@ impl DirView {
                 imp.directory_list.disconnect(select_item_id);
             }
 
-            let select_item_id = imp.directory_list.connect_loading_notify(clone!(
+            let select_item_id = imp.directory_list.connect_loading_notify(glib::clone!(
                 #[weak(rename_to = this)]
                 self,
                 #[strong(rename_to = toselect)]

@@ -8,7 +8,7 @@
 
 use adw::prelude::*;
 use adw::subclass::prelude::*;
-use glib_macros::Properties;
+use glib::Properties;
 use gtk::{glib, CompositeTemplate};
 use std::cell::RefCell;
 

@@ -29,7 +29,7 @@
 use adw::{prelude::*, subclass::prelude::*};
 use glib::subclass::Signal;
 use glib::translate::*;
-use glib_macros::{clone, Properties};
+use glib::Properties;
 use gtk::{gdk, gio, glib, CompositeTemplate};
 use std::cell::{Cell, RefCell};
 use std::sync::OnceLock;
@@ -643,7 +643,7 @@ impl FileSelector {
             actions,
             "show-hidden-files",
             false,
-            clone!(
+            glib::clone!(
                 #[weak(rename_to = this)]
                 self,
                 move |action, _| {
@@ -674,7 +674,7 @@ impl FileSelector {
             "sort",
             Some(sort_by.to_variant().type_()),
             sort_by,
-            clone!(
+            glib::clone!(
                 #[weak(rename_to = this)]
                 self,
                 move |action, param| {
@@ -695,7 +695,7 @@ impl FileSelector {
             "set-filter",
             Some("".to_variant().type_()),
             pos,
-            clone!(
+            glib::clone!(
                 #[weak(rename_to = this)]
                 self,
                 move |action, param| {
@@ -761,7 +761,7 @@ impl FileSelector {
         dialog.choose(
             Some(self),
             None::<&gio::Cancellable>,
-            clone!(
+            glib::clone!(
                 #[weak(rename_to = this)]
                 self,
                 move |response| {
