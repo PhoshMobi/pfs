@@ -823,6 +823,22 @@ impl FileSelector {
     pub fn show_toast(&self, toast: adw::Toast) {
         self.imp().toast_overlay.add_toast(toast);
     }
+
+    pub fn is_bookmarks_available(&self) -> bool {
+        self.imp().bookmarks_box.available()
+    }
+
+    pub fn add_bookmark(&self, uri: &str) {
+        self.imp().bookmarks_box.add_bookmark(uri);
+    }
+
+    pub fn del_bookmark(&self, uri: &str) {
+        self.imp().bookmarks_box.del_bookmark(uri);
+    }
+
+    pub fn is_bookmark(&self, uri: &str) -> bool {
+        self.imp().bookmarks_box.is_bookmark(uri)
+    }
 }
 
 /// A [builder-pattern] type to construct [`FileSelector`] objects.
