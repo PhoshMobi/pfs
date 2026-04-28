@@ -11,6 +11,8 @@
     <file preprocess="xml-stripblanks">path-bar.ui</file>
     <file preprocess="xml-stripblanks">places-box.ui</file>
     <file preprocess="xml-stripblanks">places-item.ui</file>
+    <file preprocess="xml-stripblanks" alias="icons/scalable/status/bookmark-filled-symbolic.svg">../data/icons/bookmark-filled-symbolic.svg</file>
+    <file preprocess="xml-stripblanks" alias="icons/scalable/status/bookmark-outline-symbolic.svg">../data/icons/bookmark-outline-symbolic.svg</file>
     <file preprocess="xml-stripblanks" alias="icons/scalable/status/funnel-symbolic.svg">../data/icons/funnel-symbolic.svg</file>
     <file preprocess="xml-stripblanks" alias="icons/scalable/status/settings-symbolic.svg">../data/icons/settings-symbolic.svg</file>
     <file preprocess="xml-stripblanks" alias="icons/scalable/status/nautilus-folder-search-symbolic.svg">../data/icons/nautilus-folder-search-symbolic.svg</file>

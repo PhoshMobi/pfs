@@ -465,6 +465,41 @@ pub mod imp {
         }
 
         #[template_callback]
+        fn folder_to_bookmark_icon_name(&self) -> &str {
+            let Some(file) = self.obj().current_folder() else {
+                return "bookmark-outline-symbolic";
+            };
+
+            if !self.bookmarks_box.available() {
+                return "bookmark-outline-symbolic";
+            }
+
+            let uri = file.uri();
+            if self.bookmarks_box.is_bookmark(&uri) {
+                "bookmark-filled-symbolic"
+            } else {
+                "bookmark-outline-symbolic"
+            }
+        }
+
+        #[template_callback]
+        fn on_bookmark_clicked(&self, button: &gtk::Button) {
+            let Some(file) = self.obj().current_folder() else {
+                return;
+            };
+
+            let uri = file.uri();
+            let icon_name = if self.bookmarks_box.is_bookmark(&uri) {
+                self.bookmarks_box.del_bookmark(&uri);
+                "bookmark-outline-symbolic"
+            } else {
+                self.bookmarks_box.add_bookmark(&uri);
+                "bookmark-filled-symbolic"
+            };
+            button.set_icon_name(icon_name);
+        }
+
+        #[template_callback]
         fn folder_to_tooltip(&self) -> String {
             let Some(file) = self.obj().current_folder() else {
                 return "".to_string();

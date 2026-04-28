@@ -227,9 +227,25 @@
                   <object class="GtkCenterBox">
                     <property name="height-request">46</property>
                     <property name="start-widget">
+                      <object class="GtkBox">
+                        <property name="spacing">6</property>
+                        <child>
                       <object class="PfsDirStack" id="dir_stack">
                         <property name="folder" bind-source="PfsFileSelector" bind-property="current-folder" bind-flags="sync-create"/>
                         <signal name="new-uri" handler="on_new_uri" swapped="true"/>
+                      </object>
+                        </child>
+                        <child>
+                          <object class="GtkButton">
+                            <property name="visible" bind-source="bookmarks_box" bind-property="available" bind-flags="sync-create"/>
+                            <binding name="icon-name">
+                              <closure type="gchararray" function="folder_to_bookmark_icon_name">
+                                <lookup name="current-folder">PfsFileSelector</lookup>
+                              </closure>
+                            </binding>
+                            <signal name="clicked" handler="on_bookmark_clicked" swapped="true"/>
+                          </object>
+                        </child>
                       </object>
                     </property>
                     <property name="center-widget">
