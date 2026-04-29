@@ -839,30 +839,27 @@ impl DirView {
             imp.directory_list.disconnect(select_item_id);
         }
 
-        if let Some(model) = imp.single_selection.model() {
-            let n_items = model.n_items();
+        let model = imp.single_selection;
+        let n_items = model.n_items();
 
-            if n_items == 0 {
-                return;
-            }
+        if n_items == 0 {
+            return;
+        }
 
-            if let Some(name) = item.basename() {
-                for n in 0..n_items - 1 {
-                    let s = model.item(n);
+        if let Some(name) = item.basename() {
+            for n in 0..n_items - 1 {
+                let s = model.item(n);
 
-                    if let Some(info) = s {
-                        if info.downcast_ref::<gio::FileInfo>().unwrap().name() == name {
-                            glib::g_debug!(LOG_DOMAIN, "Found {name:?}, selecting");
-                            imp.grid_view
-                                .scroll_to(n, gtk::ListScrollFlags::SELECT, None);
-                            return;
-                        }
+                if let Some(info) = s {
+                    if info.downcast_ref::<gio::FileInfo>().unwrap().name() == name {
+                        glib::g_debug!(LOG_DOMAIN, "Found {name:?}, selecting");
+                        imp.grid_view
+                            .scroll_to(n, gtk::ListScrollFlags::SELECT, None);
+                        return;
                     }
                 }
-                glib::g_warning!(LOG_DOMAIN, "Couldn't find {name:?} in folder");
             }
-        } else {
-            glib::g_warning!(LOG_DOMAIN, "Couldn't get model");
+            glib::g_warning!(LOG_DOMAIN, "Couldn't find {name:?} in folder");
         }
     }
 
