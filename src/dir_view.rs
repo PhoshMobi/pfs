@@ -583,7 +583,7 @@ impl DirView {
                 let uri = file.uri();
 
                 glib::g_debug!(LOG_DOMAIN, "Should open {uri:#?}");
-                self.imp().obj().emit_by_name::<()>("new-uri", &[&uri]);
+                self.emit_by_name::<()>("new-uri", &[&uri]);
             } else {
                 is_selected = true;
                 let filename = file.basename();
@@ -645,7 +645,7 @@ impl DirView {
             DisplayMode::Content
         };
         self.imp().display_mode.replace(mode);
-        self.imp().obj().notify_display_mode();
+        self.notify_display_mode();
     }
 
     #[template_callback]

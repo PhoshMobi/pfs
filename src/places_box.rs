@@ -131,6 +131,6 @@ impl PlacesBox {
 
         let uri: String = item.uri();
         glib::g_debug!(LOG_DOMAIN, "Should open {uri:#?}");
-        self.imp().obj().emit_by_name::<()>("new-uri", &[&uri]);
+        self.emit_by_name::<()>("new-uri", &[&uri]);
     }
 }

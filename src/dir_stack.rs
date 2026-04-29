@@ -156,6 +156,6 @@ impl DirStack {
         self.imp().update_actions(pos, len as usize);
 
         self.imp().is_updating.replace(true);
-        self.imp().obj().emit_by_name::<()>("new-uri", &[&uri]);
+        self.emit_by_name::<()>("new-uri", &[&uri]);
     }
 }
