@@ -112,6 +112,7 @@
                   <object class="PfsDirView" id="dir_view">
                     <property name="directories-only" bind-source="PfsFileSelector" bind-property="directory" bind-flags="sync-create"/>
                     <property name="folder" bind-source="PfsFileSelector" bind-property="current-folder" bind-flags="sync-create"/>
+                    <property name="multiple" bind-source="PfsFileSelector" bind-property="multiple" bind-flags="sync-create"/>
                     <property name="margin-start">6</property>
                     <property name="margin-end">6</property>
                     <signal name="new-uri" handler="on_new_uri" swapped="true"/>
