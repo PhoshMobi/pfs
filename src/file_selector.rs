@@ -15,8 +15,11 @@ use std::cell::{Cell, RefCell};
 use std::sync::OnceLock;
 
 use crate::{
-    config::LOG_DOMAIN, dir_stack::DirStack, dir_view::DirView, places_box::PlacesBox,
-    stateful_action, util,
+    config::LOG_DOMAIN,
+    dir_stack::DirStack,
+    dir_view::DirView,
+    places_box::PlacesBox,
+    util::{self, stateful_action},
 };
 
 const ICON_SIZES: &[u32] = &[32, 48, 64, 96, 128, 256];

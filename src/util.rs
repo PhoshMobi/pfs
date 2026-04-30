@@ -9,7 +9,6 @@
 use gtk::gio::prelude::*;
 use gtk::{gio, glib};
 
-#[macro_export]
 macro_rules! stateful_action {
     ($actions_group:expr, $name:expr, $state:expr, $callback:expr) => {
         let simple_action = gio::SimpleAction::new_stateful($name, None, &$state.to_variant());
@@ -23,6 +22,8 @@ macro_rules! stateful_action {
         $actions_group.add_action(&simple_action);
     };
 }
+
+pub(crate) use stateful_action;
 
 pub static SPECIAL_DIRS: [(glib::UserDirectory, &str); 5] = [
     (glib::UserDirectory::Documents, "folder-documents-symbolic"),
