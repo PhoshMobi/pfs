@@ -108,6 +108,10 @@ mod imp {
         #[property(get, set = Self::set_directories_only, explicit_notify)]
         pub(super) directories_only: Cell<bool>,
 
+        // Whether multiple files can be selected.
+        #[property(get, set = Self::set_multiple, explicit_notify)]
+        pub(super) multiple: Cell<bool>,
+
         // The current filter type filter
         #[property(get, set = Self::set_type_filter, construct, nullable, explicit_notify)]
         pub(super) type_filter: RefCell<Option<gtk::FileFilter>>,
@@ -255,6 +259,40 @@ mod imp {
 
             obj.notify_directories_only();
             self.update_directory_selection();
+        }
+
+        fn set_multiple(&self, multiple: bool) {
+            let obj = self.obj();
+
+            if self.selection_model.borrow().is_some() && self.multiple.get() == multiple {
+                return;
+            }
+
+            glib::g_debug!(LOG_DOMAIN, "Multiple changed to {multiple}");
+            self.multiple.set(multiple);
+
+            let selection_model: gtk::SelectionModel = if multiple {
+                gtk::MultiSelection::new(Some(self.sorted_list.get())).into()
+            } else {
+                gtk::SingleSelection::builder()
+                    .model(&self.sorted_list.get())
+                    .autoselect(false)
+                    .build()
+                    .into()
+            };
+
+            selection_model.connect_selection_changed(glib::clone!(
+                #[weak(rename_to = this)]
+                self,
+                move |_, position, n_items| this.obj().on_selection_changed(position, n_items)
+            ));
+
+            *self.selection_model.borrow_mut() = Some(selection_model);
+
+            let binding = self.selection_model.borrow();
+            self.grid_view.set_model(binding.as_ref());
+
+            obj.notify_multiple();
         }
 
         fn set_type_filter(&self, type_filter: Option<gtk::FileFilter>) {
@@ -426,19 +464,6 @@ mod imp {
             self.parent_constructed();
             let obj = self.obj();
 
-            let selection_model = gtk::SingleSelection::builder()
-                .model(&self.sorted_list.get())
-                .autoselect(false)
-                .build();
-            selection_model.connect_selection_changed(glib::clone!(
-                #[weak(rename_to = this)]
-                self,
-                move |_, position, n_items| this.obj().on_selection_changed(position, n_items)
-            ));
-            *self.selection_model.borrow_mut() = Some(selection_model.into());
-            let binding = self.selection_model.borrow();
-            self.grid_view.set_model(binding.as_ref());
-
             *self.cancellable.borrow_mut() = gio::Cancellable::new();
 
             gio::DBusProxy::for_bus(
@@ -578,7 +603,26 @@ impl DirView {
     }
 
     fn on_selection_changed(&self, position: u32, n_items: u32) {
-        glib::g_debug!(LOG_DOMAIN, "Selection changed {position:#?} {n_items:#?}");
+        // `multiple` and `directories_only ` decides the selection algorithm.
+        // * `multiple` = false and `directories_only` = false:
+        //   - Get the selection.
+        //   - If there is none, skip.
+        //   - If the selection is a directory, emit `new-uri`.
+        //   - If the selection is a file, emit `new-filename` and set `has_selection` to true.
+        // * `multiple` = false and `directories_only` = true:
+        //   - Same as above.
+        //   - `update_directory_selection` by `set_current_folder` sets has_selection to true.
+        //   - So clicking `Open` uses the current directory.
+        // * `multiple` = true and `directories_only` = false:
+        //   - Go through the selection.
+        //   - If the selection is a directory, emit `new-uri`.
+        //   - Set `has_selection` to true only if there is at least one file selected.
+        // * `multiple` = true and `directories_only` = true:
+        //   - Currently not possible, so fallback to `multiple` = false mode.
+        // * Overall:
+        //   - Go through the selection.
+        //   - If the selection is a directory, emit `new-uri`.
+        //   - Set `has_selection` to true only if there is at least one file selected.
 
         let bitset = self
             .imp()
@@ -587,43 +631,56 @@ impl DirView {
             .as_ref()
             .unwrap()
             .selection();
-        let selected_item = if bitset.is_empty() {
-            None
-        } else {
-            let binding = self.imp().selection_model.borrow();
-            binding.as_ref().unwrap().item(bitset.nth(0))
-        };
-        let mut is_selected = false;
+        let binding = self.imp().selection_model.borrow();
+        let model = binding.as_ref().unwrap();
+        let mut has_selection = false;
 
-        if let Some(info) = selected_item {
-            let fileinfo = info.downcast_ref::<gio::FileInfo>().unwrap();
-            let object = fileinfo.attribute_object("standard::file").unwrap();
-            let file = object.downcast_ref::<gio::File>().unwrap();
+        glib::g_debug!(
+            LOG_DOMAIN,
+            "Selected {} items ({position} {n_items})",
+            bitset.size()
+        );
 
-            if self.is_directory(fileinfo) {
-                let uri = file.uri();
-                glib::source::idle_add_local_once(glib::clone!(
-                    #[weak(rename_to = this)]
-                    self,
-                    move || {
-                        glib::g_debug!(LOG_DOMAIN, "Should open {uri:#?}");
-                        this.emit_by_name::<()>("new-uri", &[&uri]);
-                    }
-                ));
-            } else {
-                is_selected = true;
-                let filename = file.basename();
-                self.imp()
-                    .obj()
-                    .emit_by_name::<()>("new-filename", &[&filename]);
-            }
-        }
-
-        if self.directories_only() {
+        let Some((bitset_iter, start)) = gtk::BitsetIter::init_first(&bitset) else {
+            self.imp().set_has_selection(has_selection);
             return;
+        };
+        let mut value = Some(start);
+        let mut iter = bitset_iter.into_iter();
+
+        while let Some(i) = value {
+            let selected_item = model.item(i);
+            if let Some(info) = selected_item {
+                let fileinfo = info.downcast_ref::<gio::FileInfo>().unwrap();
+                let object = fileinfo.attribute_object("standard::file").unwrap();
+                let file = object.downcast_ref::<gio::File>().unwrap();
+
+                if self.is_directory(fileinfo) {
+                    let uri = file.uri();
+                    // Emit `new-uri` in idle callback due to
+                    // https://gitlab.gnome.org/GNOME/gtk/-/work_items/8165
+                    glib::source::idle_add_local_once(glib::clone!(
+                        #[weak(rename_to = this)]
+                        self,
+                        move || {
+                            glib::g_debug!(LOG_DOMAIN, "Should open {uri:#?}");
+                            this.emit_by_name::<()>("new-uri", &[&uri]);
+                        }
+                    ));
+                    has_selection = false;
+                    break;
+                } else {
+                    has_selection = true;
+                    let filename = file.basename();
+                    self.imp()
+                        .obj()
+                        .emit_by_name::<()>("new-filename", &[&filename]);
+                }
+            }
+            value = iter.next();
         }
 
-        self.imp().set_has_selection(is_selected);
+        self.imp().set_has_selection(has_selection);
     }
 
     #[template_callback]
@@ -681,24 +738,31 @@ impl DirView {
     }
 
     pub fn selected(&self) -> Option<Vec<String>> {
-        let vec = if self.directories_only() {
+        if self.directories_only() {
             match self.folder().unwrap().path() {
                 None => return None,
-                Some(_) => vec![self.folder().unwrap().uri().to_string()],
+                Some(_) => return Some(vec![self.folder().unwrap().uri().to_string()]),
             }
-        } else {
-            let bitset = self
-                .imp()
-                .selection_model
-                .borrow()
-                .as_ref()
-                .unwrap()
-                .selection();
-            if bitset.is_empty() {
-                return None;
-            }
-            let binding = self.imp().selection_model.borrow();
-            let selected = binding.as_ref().unwrap().item(bitset.nth(0));
+        }
+
+        let mut vec = Vec::new();
+
+        let bitset = self
+            .imp()
+            .selection_model
+            .borrow()
+            .as_ref()
+            .unwrap()
+            .selection();
+        let binding = self.imp().selection_model.borrow();
+        let model = binding.as_ref().unwrap();
+
+        let (bitset_iter, start) = gtk::BitsetIter::init_first(&bitset)?;
+        let mut value = Some(start);
+        let mut iter = bitset_iter.into_iter();
+
+        while let Some(i) = value {
+            let selected = model.item(i);
             let item = selected?;
 
             let file = item
@@ -710,8 +774,11 @@ impl DirView {
             let uri = file.downcast_ref::<gio::File>().unwrap().uri();
             glib::g_debug!(LOG_DOMAIN, "Uri {uri:#?}");
 
-            vec![uri.to_string()]
-        };
+            vec.push(uri.to_string());
+
+            value = iter.next();
+        }
+
         Some(vec)
     }
 
