@@ -128,6 +128,10 @@ pub mod imp {
         #[property(get = Self::get_selected_choices, builder(glib::VariantTy::ARRAY))]
         pub selected_choices: RefCell<Option<glib::Variant>>,
 
+        //
+        // Non portal props
+        //
+
         // Whether to close the window after a selection
         #[property(get, set, construct, default = true)]
         pub close_on_done: Cell<bool>,
@@ -507,6 +511,10 @@ impl FileSelector {
         Self::default()
     }
 
+    pub fn builder() -> glib::object::ObjectBuilder<'static, Self> {
+        glib::Object::builder()
+    }
+
     fn setup_gsettings(&self) {
         if !util::is_schema_installed() {
             glib::g_debug!(
@@ -741,6 +749,73 @@ impl FileSelector {
 
     pub fn show_toast(&self, toast: adw::Toast) {
         self.imp().toast_overlay.add_toast(toast);
+    }
+}
+
+pub struct FileSelectorBuilder {
+    builder: glib::object::ObjectBuilder<'static, FileSelector>,
+}
+
+impl Default for FileSelectorBuilder {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl FileSelectorBuilder {
+    pub fn new() -> Self {
+        Self {
+            builder: FileSelector::builder(),
+        }
+    }
+
+    pub fn title(mut self, title: &str) -> Self {
+        self.builder = self.builder.property("title", title);
+        self
+    }
+
+    pub fn accept_label(mut self, label: &str) -> Self {
+        self.builder = self.builder.property("accept-label", label);
+        self
+    }
+
+    pub fn directory(mut self, is_dir: bool) -> Self {
+        self.builder = self.builder.property("directory", is_dir);
+        self
+    }
+
+    pub fn filters(mut self, filters: gio::ListModel) -> Self {
+        self.builder = self.builder.property("filters", filters);
+        self
+    }
+
+    pub fn current_filter(mut self, filter: u32) -> Self {
+        self.builder = self.builder.property("current-filter", filter);
+        self
+    }
+
+    pub fn current_folder(mut self, folder: gio::File) -> Self {
+        self.builder = self.builder.property("current-folder", folder);
+        self
+    }
+
+    pub fn filename(mut self, filename: &str) -> Self {
+        self.builder = self.builder.property("filename", filename);
+        self
+    }
+
+    pub fn choices(mut self, choices: glib::Variant) -> Self {
+        self.builder = self.builder.property("choices", choices);
+        self
+    }
+
+    pub fn close_on_done(mut self, close_on_done: bool) -> Self {
+        self.builder = self.builder.property("close-on-done", close_on_done);
+        self
+    }
+
+    pub fn build(self) -> FileSelector {
+        self.builder.build()
     }
 }
 

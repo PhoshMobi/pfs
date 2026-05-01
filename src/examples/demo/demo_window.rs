@@ -219,7 +219,7 @@ impl PfsDemoWindow {
 
     pub fn save_files(&self) {
         glib::g_debug!(LOG_DOMAIN, "Save Files");
-        let file_selector = glib::Object::builder::<FileSelector>()
+        let file_selector = FileSelector::builder()
             .property("accept-label", "Done")
             .property("title", "Save Files")
             .property("current-folder", gio::File::for_path("/home"))
