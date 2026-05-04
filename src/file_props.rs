@@ -148,6 +148,10 @@ impl FileProps {
         Self::default()
     }
 
+    pub fn builder() -> FilePropsBuilder {
+        FilePropsBuilder::new()
+    }
+
     fn update_info(&self, info: &gio::FileInfo) {
         let imp = self.imp();
         let mut have_thumbnail = false;
@@ -327,5 +331,32 @@ impl FileProps {
 
         file_selector.set_mode(FileSelectorMode::OpenFile);
         file_selector.present();
+    }
+}
+
+pub struct FilePropsBuilder {
+    builder: glib::object::ObjectBuilder<'static, FileProps>,
+}
+
+impl Default for FilePropsBuilder {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl FilePropsBuilder {
+    pub fn new() -> Self {
+        Self {
+            builder: glib::Object::builder(),
+        }
+    }
+
+    pub fn file(mut self, file: &gio::File) -> Self {
+        self.builder = self.builder.property("file", file);
+        self
+    }
+
+    pub fn build(self) -> FileProps {
+        self.builder.build()
     }
 }
