@@ -171,9 +171,7 @@ impl GridItem {
         let uri = file.uri();
         glib::g_debug!(LOG_DOMAIN, "Showing properties for {uri}");
 
-        let file_props = glib::Object::builder::<FileProps>()
-            .property("file", &file)
-            .build();
+        let file_props = FileProps::builder().file(&file).build();
 
         file_props.set_transient_for(Some(&self.get_file_selector()));
         file_props.present();
