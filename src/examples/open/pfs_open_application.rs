@@ -288,9 +288,7 @@ impl PfsOpenApplication {
 
         glib::g_message!(LOG_DOMAIN, "Showing props for {uri}");
 
-        let file_props = glib::Object::builder::<FileProps>()
-            .property("file", file)
-            .build();
+        let file_props = FileProps::builder().file(file).build();
 
         file_props.connect_closure(
             "done",
