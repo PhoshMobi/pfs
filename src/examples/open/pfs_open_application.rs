@@ -13,7 +13,7 @@ use gtk::{gdk, gio, glib};
 use std::cell::RefCell;
 
 use pfs::file_props::FileProps;
-use pfs::file_selector::{FileSelector, FileSelectorMode};
+use pfs::file_selector::{FileSelector, FileSelectorBuilder, FileSelectorMode};
 
 use crate::config::LOG_DOMAIN;
 
@@ -234,11 +234,11 @@ impl PfsOpenApplication {
 
         glib::g_message!(LOG_DOMAIN, "Opening {uri}");
 
-        let file_selector = glib::Object::builder::<FileSelector>()
-            .property("accept_label", gettextrs::gettext("Open"))
-            .property("title", gettextrs::gettext("Select a File"))
-            .property("current-folder", dir)
-            .property("close-on-done", false)
+        let file_selector = FileSelectorBuilder::new()
+            .accept_label(&gettextrs::gettext("Open"))
+            .title(&gettextrs::gettext("Select a File"))
+            .current_folder(dir.clone())
+            .close_on_done(false)
             .build();
 
         file_selector.connect_closure(

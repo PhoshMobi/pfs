@@ -11,7 +11,7 @@ use gtk::prelude::*;
 use gtk::{gio, glib};
 use std::cell::RefCell;
 
-use pfs::file_selector::{FileSelector, FileSelectorMode};
+use pfs::file_selector::{FileSelector, FileSelectorBuilder, FileSelectorMode};
 
 use crate::config::LOG_DOMAIN;
 
@@ -118,12 +118,12 @@ impl PfsDemoWindow {
         filters.append(&all_files);
         let pos = filters.find(&all_files).unwrap();
 
-        let file_selector = glib::Object::builder::<FileSelector>()
-            .property("accept_label", "Done")
-            .property("title", "Select a File")
-            .property("current-folder", gio::File::for_path("/home"))
-            .property("filters", filters)
-            .property("current-filter", pos)
+        let file_selector = FileSelectorBuilder::new()
+            .accept_label("Done")
+            .title("Select a File")
+            .current_folder(gio::File::for_path("/home"))
+            .filters(filters.into())
+            .current_filter(pos)
             .build();
 
         let empty: Vec<(String, String)> = Vec::new();
@@ -192,11 +192,11 @@ impl PfsDemoWindow {
 
     pub fn save_file(&self) {
         glib::g_debug!(LOG_DOMAIN, "Save File");
-        let file_selector = glib::Object::builder::<FileSelector>()
-            .property("accept-label", "Save")
-            .property("title", "Save File")
-            .property("current-folder", gio::File::for_path("/home"))
-            .property("filename", "newfile.txt")
+        let file_selector = FileSelectorBuilder::new()
+            .accept_label("Save")
+            .title("Save File")
+            .current_folder(gio::File::for_path("/home"))
+            .filename("newfile.txt")
             .build();
 
         file_selector.connect_closure(
@@ -219,10 +219,10 @@ impl PfsDemoWindow {
 
     pub fn save_files(&self) {
         glib::g_debug!(LOG_DOMAIN, "Save Files");
-        let file_selector = glib::Object::builder::<FileSelector>()
-            .property("accept-label", "Done")
-            .property("title", "Save Files")
-            .property("current-folder", gio::File::for_path("/home"))
+        let file_selector = FileSelectorBuilder::new()
+            .title("Save Files")
+            .accept_label("Done")
+            .current_folder(gio::File::for_path("/home"))
             .build();
 
         file_selector.connect_closure(
