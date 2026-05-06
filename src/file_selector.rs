@@ -6,6 +6,26 @@
  * Author: Guido Günther <agx@sigxcpu.org>
  */
 
+//! File selector widget for Phosh.
+//!
+//! This module provides [`FileSelector`], a GTK4/libadwaita widget for
+//! selecting files and directories. It supports opening files, saving files,
+//! and selecting directories for saving multiple files.
+//!
+//! # Example
+//!
+//! ```no_run
+//! use gtk::prelude::*;
+//! use pfs::file_selector::{FileSelector, FileSelectorMode};
+//!
+//! pfs::init::init();
+//!
+//! let selector = FileSelector::new();
+//! selector.set_mode(FileSelectorMode::OpenFile);
+//! selector.set_accept_label("Open");
+//! selector.present();
+//! ```
+
 use adw::{prelude::*, subclass::prelude::*};
 use glib::subclass::Signal;
 use glib::translate::*;
@@ -15,33 +35,47 @@ use std::cell::{Cell, RefCell};
 use std::sync::OnceLock;
 
 use crate::{
-    config::LOG_DOMAIN, dir_stack::DirStack, dir_view::DirView, places_box::PlacesBox,
-    stateful_action, util,
+    config::LOG_DOMAIN,
+    dir_stack::DirStack,
+    dir_view::DirView,
+    places_box::PlacesBox,
+    util::{self, stateful_action},
 };
 
 const ICON_SIZES: &[u32] = &[32, 48, 64, 96, 128, 256];
 const ICON_SIZE_MIN: u32 = ICON_SIZES[0];
 const ICON_SIZE_MAX: u32 = ICON_SIZES[ICON_SIZES.len() - 1];
 
+/// The operation mode for a [`FileSelector`].
+///
+/// Determines whether the file selector is used for opening files,
+/// saving a single file, or selecting a directory to save multiple files.
 #[derive(Debug, Copy, Clone, Default, PartialEq, gio::glib::Enum)]
 #[enum_type(name = "PfsFileSelectorMode")]
 pub enum FileSelectorMode {
+    /// Select one or more existing files to open.
     #[default]
     OpenFile,
+    /// Save a single file (prompts for filename).
     SaveFile,
+    /// Select a directory to save multiple files into.
     SaveFiles,
 }
 
+/// The sorting mode for files in a [`FileSelector`].
 #[derive(Debug, Copy, Clone, Default, PartialEq, gio::glib::Enum)]
 #[enum_type(name = "PfsSortMode")]
 pub enum SortMode {
+    /// Sort files alphabetically by display name.
     #[default]
     #[enum_value(nick = "name")]
     DisplayName = 0,
+    /// Sort files by modification time (newest first when reversed).
     #[enum_value(nick = "mtime")]
     ModificationTime = 1,
 }
 
+/// Implementation details for [`FileSelector`].
 pub mod imp {
     use super::*;
 
@@ -507,10 +541,25 @@ impl Default for FileSelector {
 }
 
 impl FileSelector {
+    /// Creates a new `FileSelector` widget.
+    ///
+    /// The selector defaults to [`FileSelectorMode::OpenFile`] mode.
+    /// Use [`set_mode`](Self::set_mode) to change the operation mode.
     pub fn new() -> Self {
         Self::default()
     }
 
+    /// Creates a new [`glib::object::ObjectBuilder`] for constructing [`FileSelector`] objects.
+    ///
+    /// ```no_run
+    /// use pfs::file_selector::FileSelector;
+    ///
+    /// let selector = FileSelector::builder()
+    ///     .property("title", "Open File")
+    ///     .property("accept-label", "Open")
+    ///     .build();
+    /// ```
+    /// For a typed wrapper with named setter methods, see [`FileSelectorBuilder`].
     pub fn builder() -> glib::object::ObjectBuilder<'static, Self> {
         glib::Object::builder()
     }
@@ -724,6 +773,14 @@ impl FileSelector {
         );
     }
 
+    /// Returns the URIs of the selected files.
+    ///
+    /// In [`FileSelectorMode::OpenFile`] mode, returns the URIs of the selected files.
+    /// In [`FileSelectorMode::SaveFile`] mode, returns exactly one URI of the file to save
+    /// (constructed from `current-folder` and `filename`).
+    /// In [`FileSelectorMode::SaveFiles`] mode, returns URIs (one per file) to save.
+    ///
+    /// Returns `None` if no selection has been made.
     pub fn selected(&self) -> Option<Vec<String>> {
         let items = self.imp().dir_view.get().selected();
 
@@ -737,21 +794,45 @@ impl FileSelector {
         }
     }
 
+    /// Sets the current directory from a path string.
+    ///
+    /// This is a convenience method that creates a [`gio::File`] from the path
+    /// and calls [`set_current_folder`](Self::set_current_folder).
     pub fn set_current_directory(&self, directory: String) {
         let file = gio::File::for_path(directory);
 
         self.set_current_folder(file);
     }
 
+    /// Programmatically selects a file in the current directory view.
+    ///
+    /// The file must be in the currently displayed directory.
     pub fn select_item(&self, item: &gio::File) {
         self.imp().dir_view.select_item(item);
     }
 
+    /// Displays a toast notification in the file selector.
     pub fn show_toast(&self, toast: adw::Toast) {
         self.imp().toast_overlay.add_toast(toast);
     }
 }
 
+/// A [builder-pattern] type to construct [`FileSelector`] objects.
+///
+/// Provides typed, named setters for [`FileSelector`]'s construction-time
+/// properties.
+///
+/// ```no_run
+/// use gtk::gio;
+/// use pfs::file_selector::FileSelectorBuilder;
+///
+/// let folder = gio::File::for_path("/home/user/Documents");
+/// let selector = FileSelectorBuilder::new()
+///     .title("Open File")
+///     .accept_label("Open")
+///     .current_folder(folder)
+///     .build();
+/// ```
 pub struct FileSelectorBuilder {
     builder: glib::object::ObjectBuilder<'static, FileSelector>,
 }
@@ -763,57 +844,80 @@ impl Default for FileSelectorBuilder {
 }
 
 impl FileSelectorBuilder {
+    /// Creates a new [`FileSelectorBuilder`].
     pub fn new() -> Self {
         Self {
             builder: FileSelector::builder(),
         }
     }
 
+    /// Sets the `title` property used as the window title of the selector.
     pub fn title(mut self, title: &str) -> Self {
         self.builder = self.builder.property("title", title);
         self
     }
 
+    /// Sets the `accept-label` property shown on the accept button (e.g. `"Open"` or `"Save"`).
     pub fn accept_label(mut self, label: &str) -> Self {
         self.builder = self.builder.property("accept-label", label);
         self
     }
 
+    /// Sets the `directory` property.
+    ///
+    /// When `true`, the selector picks a directory instead of files.
     pub fn directory(mut self, is_dir: bool) -> Self {
         self.builder = self.builder.property("directory", is_dir);
         self
     }
 
+    /// Sets the `filters` property, a [`gio::ListModel`] of
+    /// [`gtk::FileFilter`]s to filter the visible files by.
     pub fn filters(mut self, filters: gio::ListModel) -> Self {
         self.builder = self.builder.property("filters", filters);
         self
     }
 
+    /// Sets the `current-filter` property to the position (within
+    /// [`filters`](Self::filters)) of the filter that should be active
+    /// initially.
     pub fn current_filter(mut self, filter: u32) -> Self {
         self.builder = self.builder.property("current-filter", filter);
         self
     }
 
+    /// Sets the `current-folder` property, the folder the selector displays
+    /// initially.
     pub fn current_folder(mut self, folder: gio::File) -> Self {
         self.builder = self.builder.property("current-folder", folder);
         self
     }
 
+    /// Sets the `filename` property, the suggested basename when saving a file.
     pub fn filename(mut self, filename: &str) -> Self {
         self.builder = self.builder.property("filename", filename);
         self
     }
 
+    /// Sets the `choices` property, a [`struct@glib::Variant`] of additional
+    /// choices (toggles or combo boxes) presented in the selector's options
+    /// menu.
     pub fn choices(mut self, choices: glib::Variant) -> Self {
         self.builder = self.builder.property("choices", choices);
         self
     }
 
+    /// Sets the `close-on-done` property.
+    ///
+    /// When `true` (the default), the window is closed automatically after the
+    /// user accepts the selection. Cancellation always closes the window
+    /// regardless of this property.
     pub fn close_on_done(mut self, close_on_done: bool) -> Self {
         self.builder = self.builder.property("close-on-done", close_on_done);
         self
     }
 
+    /// Build the [`FileSelector`].
     pub fn build(self) -> FileSelector {
         self.builder.build()
     }
