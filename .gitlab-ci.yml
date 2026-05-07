@@ -167,6 +167,7 @@ pages:
   needs: [build-doc]
   script:
     - mv target/doc public
+    - echo '<meta http-equiv="refresh" content="0; url=pfs/index.html">' > public/index.html
   artifacts:
     paths:
       - public
