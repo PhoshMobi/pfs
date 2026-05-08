@@ -30,3 +30,8 @@ G_MESSAGES_DEBUG=pfs ./_build/run _build/src/examples/pfs-c-demo
 
 * Issue tracker: <https://gitlab.gnome.org/World/Phosh/pfs/issues>
 * Matrix: <https://matrix.to/#/#phosh:phosh.mobi>
+
+## Development Documentation
+
+The latest public API documentation is available at
+<https://world.pages.gitlab.gnome.org/Phosh/pfs>
