@@ -1,0 +1,95 @@
+# Polish translation for pfs.
+# Copyright (C) 2024-2026 Phosh.mobi e.V.
+# This file is distributed under the same license as the pfs package.
+# nicole mikołajczyk <git@mkljczk.pl>, 2026.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-05-06 18:27+0200\n"
+"PO-Revision-Date: 2026-05-09 01:14+0200\n"
+"Last-Translator: nicole mikołajczyk <git@mkljczk.pl>\n"
+"Language-Team: \n"
+"Language: pl\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Poedit 3.9\n"
+
+#: src/file_props.rs:305
+#, rust-format
+msgid "Failed to get info for {}"
+msgstr "Nie udało się uzyskać informacji o {}"
+
+#: src/file-props.ui:18
+msgid "File Properties"
+msgstr "Właściwości pliku"
+
+#: src/file-props.ui:25
+msgid "Ok"
+msgstr "OK"
+
+#: src/file-props.ui:112
+msgid "Parent _Folder"
+msgstr "_Katalog nadrzędny"
+
+#: src/file-props.ui:128
+msgid "Open Parent Folder"
+msgstr "Otwórz katalog nadrzędny"
+
+#: src/file-props.ui:146
+msgid "Accessed"
+msgstr "Uzyskano dostęp"
+
+#: src/file-props.ui:160
+msgid "Modified"
+msgstr "Zmodyfikowano"
+
+#: src/file-props.ui:174
+msgid "Created"
+msgstr "Utworzono"
+
+#: src/file-selector.ui:7
+msgid "Icon Size"
+msgstr "Rozmiar ikon"
+
+#. Translators: This is a sort order for files
+#: src/file-selector.ui:16
+msgid "A-Z"
+msgstr "Od A do Z"
+
+#. Translators: This is a sort order for files
+#: src/file-selector.ui:22
+msgid "Z-A"
+msgstr "Od Z do A"
+
+#. Translators: This is a sort order for files
+#: src/file-selector.ui:30
+msgid "Last changed"
+msgstr "Ostatnia zmiana"
+
+#. Translators: This is a sort order for files
+#: src/file-selector.ui:36
+msgid "First changed"
+msgstr "Najstarsza zmiana"
+
+#: src/file-selector.ui:43
+msgid "Show _Hidden Files"
+msgstr "_Pokazuj ukryte pliki"
+
+#: src/file-selector.ui:160
+msgid "Name"
+msgstr "Nazwa"
+
+#: src/file-selector.ui:191
+msgid "Filename"
+msgstr "Nazwa pliku"
+
+#: src/grid-item.ui:62
+msgid "Properties"
+msgstr "Właściwości"
+
+#: src/grid-item.ui:66
+msgid "Copy Name"
+msgstr "Kopiuj nazwę"
