@@ -29,15 +29,17 @@
 use adw::{prelude::*, subclass::prelude::*};
 use glib::subclass::Signal;
 use glib::translate::*;
-use glib_macros::{clone, Properties};
+use glib::Properties;
 use gtk::{gdk, gio, glib, CompositeTemplate};
 use std::cell::{Cell, RefCell};
 use std::sync::OnceLock;
 
 use crate::{
+    bookmarks_box::BookmarksBox,
     config::LOG_DOMAIN,
     dir_stack::DirStack,
     dir_view::DirView,
+    path_bar::PathBar,
     places_box::PlacesBox,
     util::{self, stateful_action},
 };
@@ -87,7 +89,13 @@ pub mod imp {
         pub dir_view: TemplateChild<DirView>,
 
         #[template_child]
+        pub bookmarks_box: TemplateChild<BookmarksBox>,
+
+        #[template_child]
         pub places_box: TemplateChild<PlacesBox>,
+
+        #[template_child]
+        pub path_bar: TemplateChild<PathBar>,
 
         #[template_child]
         pub dir_stack: TemplateChild<DirStack>,
@@ -457,6 +465,41 @@ pub mod imp {
         }
 
         #[template_callback]
+        fn folder_to_bookmark_icon_name(&self) -> &str {
+            let Some(file) = self.obj().current_folder() else {
+                return "bookmark-outline-symbolic";
+            };
+
+            if !self.bookmarks_box.available() {
+                return "bookmark-outline-symbolic";
+            }
+
+            let uri = file.uri();
+            if self.bookmarks_box.is_bookmark(&uri) {
+                "bookmark-filled-symbolic"
+            } else {
+                "bookmark-outline-symbolic"
+            }
+        }
+
+        #[template_callback]
+        fn on_bookmark_clicked(&self, button: &gtk::Button) {
+            let Some(file) = self.obj().current_folder() else {
+                return;
+            };
+
+            let uri = file.uri();
+            let icon_name = if self.bookmarks_box.is_bookmark(&uri) {
+                self.bookmarks_box.del_bookmark(&uri);
+                "bookmark-outline-symbolic"
+            } else {
+                self.bookmarks_box.add_bookmark(&uri);
+                "bookmark-filled-symbolic"
+            };
+            button.set_icon_name(icon_name);
+        }
+
+        #[template_callback]
         fn folder_to_tooltip(&self) -> String {
             let Some(file) = self.obj().current_folder() else {
                 return "".to_string();
@@ -643,7 +686,7 @@ impl FileSelector {
             actions,
             "show-hidden-files",
             false,
-            clone!(
+            glib::clone!(
                 #[weak(rename_to = this)]
                 self,
                 move |action, _| {
@@ -674,7 +717,7 @@ impl FileSelector {
             "sort",
             Some(sort_by.to_variant().type_()),
             sort_by,
-            clone!(
+            glib::clone!(
                 #[weak(rename_to = this)]
                 self,
                 move |action, param| {
@@ -695,7 +738,7 @@ impl FileSelector {
             "set-filter",
             Some("".to_variant().type_()),
             pos,
-            clone!(
+            glib::clone!(
                 #[weak(rename_to = this)]
                 self,
                 move |action, param| {
@@ -761,7 +804,7 @@ impl FileSelector {
         dialog.choose(
             Some(self),
             None::<&gio::Cancellable>,
-            clone!(
+            glib::clone!(
                 #[weak(rename_to = this)]
                 self,
                 move |response| {
@@ -814,6 +857,22 @@ impl FileSelector {
     /// Displays a toast notification in the file selector.
     pub fn show_toast(&self, toast: adw::Toast) {
         self.imp().toast_overlay.add_toast(toast);
+    }
+
+    pub fn is_bookmarks_available(&self) -> bool {
+        self.imp().bookmarks_box.available()
+    }
+
+    pub fn add_bookmark(&self, uri: &str) {
+        self.imp().bookmarks_box.add_bookmark(uri);
+    }
+
+    pub fn del_bookmark(&self, uri: &str) {
+        self.imp().bookmarks_box.del_bookmark(uri);
+    }
+
+    pub fn is_bookmark(&self, uri: &str) -> bool {
+        self.imp().bookmarks_box.is_bookmark(uri)
     }
 }
 

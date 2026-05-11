@@ -9,7 +9,7 @@
 use adw::prelude::*;
 use adw::subclass::prelude::*;
 use glib::subclass::Signal;
-use glib_macros::{clone, Properties};
+use glib::Properties;
 use gtk::{gio, glib, CompositeTemplate};
 use std::cell::RefCell;
 use std::sync::OnceLock;
@@ -68,7 +68,7 @@ mod imp {
                 let button = gtk::Button::new();
                 button.set_label(part.to_str().unwrap());
                 self.path_box.append(&button);
-                button.connect_clicked(clone!(
+                button.connect_clicked(glib::clone!(
                     #[weak(rename_to = this)]
                     self,
                     move |clicked_button| {

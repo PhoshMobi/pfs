@@ -57,8 +57,7 @@
           <object class="AdwBottomSheet" id="bottom_sheet">
             <property name="content">
               <object class="AdwToolbarView">
-                <property name="margin-bottom" bind-source="bottom_sheet" bind-property="bottom-bar-height"
-                          bind-flags="sync-create"/>
+                <property name="margin-bottom" bind-source="bottom_sheet" bind-property="bottom-bar-height" bind-flags="sync-create"/>
                 <child type="top">
                   <object class="AdwHeaderBar">
                     <property name="decoration-layout">""</property>
@@ -127,12 +126,43 @@
                   <object class="AdwHeaderBar"/>
                 </child>
                 <property name="content">
-                  <object class="GtkScrolledWindow">
-                    <property name="vscrollbar-policy">automatic</property>
-                    <property name="hscrollbar-policy">never</property>
-                    <property name="propagate-natural-height">True</property>
+                  <object class="GtkBox">
+                    <property name="orientation">vertical</property>
                     <child>
-                      <object class="PfsPlacesBox" id="places_box">
+                      <object class="AdwInlineViewSwitcher">
+                        <property name="stack">view_stack</property>
+                        <property name="homogeneous">1</property>
+                        <property name="halign">center</property>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="AdwViewStack" id="view_stack">
+                        <child>
+                          <object class="AdwViewStackPage">
+                            <property name="name">places</property>
+                            <property name="title" translatable="yes">Places</property>
+                            <property name="child">
+                              <object class="PfsPlacesBox" id="places_box">
+                                <signal name="new-uri" handler="on_new_uri" swapped="true"/>
+                              </object>
+                            </property>
+                          </object>
+                        </child>
+                        <child>
+                          <object class="AdwViewStackPage">
+                            <property name="name">bookmarks</property>
+                            <property name="title" translatable="yes">Bookmarks</property>
+                            <property name="child">
+                              <object class="PfsBookmarksBox" id="bookmarks_box">
+                                <signal name="new-uri" handler="on_new_uri" swapped="true"/>
+                              </object>
+                            </property>
+                          </object>
+                        </child>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="PfsPathBar" id="path_bar">
                         <property name="folder" bind-source="PfsFileSelector" bind-property="current-folder" bind-flags="sync-create"/>
                         <signal name="new-uri" handler="on_new_uri" swapped="true"/>
                       </object>
@@ -171,8 +201,7 @@
                             <property name="activates-default">True</property>
                             <property name="buffer">
                               <object class="GtkEntryBuffer" id="filename_buffer">
-                                <property name="text" bind-source="PfsFileSelector" bind-property="filename"
-                                          bind-flags="sync-create|bidirectional"/>
+                                <property name="text" bind-source="PfsFileSelector" bind-property="filename" bind-flags="sync-create|bidirectional"/>
                               </object>
                             </property>
                           </object>
@@ -198,9 +227,25 @@
                   <object class="GtkCenterBox">
                     <property name="height-request">46</property>
                     <property name="start-widget">
-                      <object class="PfsDirStack" id="dir_stack">
-                        <property name="folder" bind-source="PfsFileSelector" bind-property="current-folder" bind-flags="sync-create"/>
-                        <signal name="new-uri" handler="on_new_uri" swapped="true"/>
+                      <object class="GtkBox">
+                        <property name="spacing">6</property>
+                        <child>
+                          <object class="PfsDirStack" id="dir_stack">
+                            <property name="folder" bind-source="PfsFileSelector" bind-property="current-folder" bind-flags="sync-create"/>
+                            <signal name="new-uri" handler="on_new_uri" swapped="true"/>
+                          </object>
+                        </child>
+                        <child>
+                          <object class="GtkButton">
+                            <property name="visible" bind-source="bookmarks_box" bind-property="available" bind-flags="sync-create"/>
+                            <binding name="icon-name">
+                              <closure type="gchararray" function="folder_to_bookmark_icon_name">
+                                <lookup name="current-folder">PfsFileSelector</lookup>
+                              </closure>
+                            </binding>
+                            <signal name="clicked" handler="on_bookmark_clicked" swapped="true"/>
+                          </object>
+                        </child>
                       </object>
                     </property>
                     <property name="center-widget">

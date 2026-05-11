@@ -62,7 +62,7 @@
   </template>
 
   <object class="GtkDirectoryList" id="directory_list">
-    <property name="attributes">standard::display-name,standard::icon,standard::content-type,time::modified,thumbnail::*</property>
+    <property name="attributes">standard::display-name,standard::icon,standard::content-type,standard::type,time::modified,thumbnail::*</property>
     <signal name="notify::loading" handler="on_loading_changed" swapped="true"/>
   </object>
   <object class="GtkFilterListModel" id="type_filtered_list">

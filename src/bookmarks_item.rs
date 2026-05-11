@@ -1,24 +1,24 @@
 /*
- * Copyright 2024-2025 Phosh.mobi e.V.
+ * Copyright 2026 Phosh.mobi e.V.
  *
  * SPDX-License-Identifier: GPL-3.0-or-later
  *
- * Author: Guido Günther <agx@sigxcpu.org>
+ * Author: Arun Mani J <arun.mani@tether.to>
  */
 
 use adw::prelude::*;
 use adw::subclass::prelude::*;
 use glib::Properties;
-use gtk::{glib, CompositeTemplate};
+use gtk::{gio, glib, CompositeTemplate};
 use std::cell::RefCell;
 
 mod imp {
     use super::*;
 
     #[derive(Debug, Default, CompositeTemplate, Properties)]
-    #[template(resource = "/mobi/phosh/FileSelector/places-item.ui")]
-    #[properties(wrapper_type = super::PlacesItem)]
-    pub struct PlacesItem {
+    #[template(resource = "/mobi/phosh/FileSelector/bookmarks-item.ui")]
+    #[properties(wrapper_type = super::BookmarksItem)]
+    pub struct BookmarksItem {
         #[template_child]
         pub icon: TemplateChild<gtk::Image>,
 
@@ -29,16 +29,16 @@ mod imp {
         place: RefCell<String>,
 
         #[property(get, set)]
-        icon_name: RefCell<String>,
+        gicon: RefCell<Option<gio::Icon>>,
 
         #[property(get, set)]
         uri: RefCell<String>,
     }
 
     #[glib::object_subclass]
-    impl ObjectSubclass for PlacesItem {
-        const NAME: &'static str = "PfsPlacesItem";
-        type Type = super::PlacesItem;
+    impl ObjectSubclass for BookmarksItem {
+        const NAME: &'static str = "PfsBookmarksItem";
+        type Type = super::BookmarksItem;
         type ParentType = adw::Bin;
 
         fn class_init(klass: &mut Self::Class) {
@@ -51,33 +51,33 @@ mod imp {
         }
     }
 
-    impl PlacesItem {}
+    impl BookmarksItem {}
 
     #[glib::derived_properties]
-    impl ObjectImpl for PlacesItem {
+    impl ObjectImpl for BookmarksItem {
         fn constructed(&self) {
             self.parent_constructed();
         }
     }
 
-    impl WidgetImpl for PlacesItem {}
-    impl BinImpl for PlacesItem {}
+    impl WidgetImpl for BookmarksItem {}
+    impl BinImpl for BookmarksItem {}
 }
 
 glib::wrapper! {
-    pub struct PlacesItem(ObjectSubclass<imp::PlacesItem>)
+    pub struct BookmarksItem(ObjectSubclass<imp::BookmarksItem>)
         @extends adw::Bin, gtk::Widget,
         @implements gtk::Accessible, gtk::Buildable, gtk::ConstraintTarget;
 }
 
-impl Default for PlacesItem {
+impl Default for BookmarksItem {
     fn default() -> Self {
         glib::Object::new::<Self>()
     }
 }
 
 #[gtk::template_callbacks]
-impl PlacesItem {
+impl BookmarksItem {
     pub fn new() -> Self {
         Self::default()
     }

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <interface>
   <requires lib="gtk" version="4.0"/>
-  <template class="PfsPlacesItem" parent="AdwBin">
+  <template class="PfsBookmarksItem" parent="AdwBin">
     <property name="valign">start</property>
     <child>
       <object class="AdwClamp">
@@ -16,8 +16,9 @@
                 <property name="hexpand">True</property>
                 <property name="valign">center</property>
                 <property name="vexpand">True</property>
-                <binding name="icon-name">
-                  <lookup name="icon-name" type="PfsPlacsItem"/>
+                <property name="pixel-size">64</property>
+                <binding name="gicon">
+                  <lookup name="gicon" type="PfsBookmarksItem"/>
                 </binding>
                 <accessibility>
                   <relation name="labelled-by">label</relation>
@@ -30,10 +31,10 @@
                 <property name="justify">center</property>
                 <property name="lines">3</property>
                 <property name="wrap">True</property>
-                <property name="wrap-mode">word-char</property>
                 <binding name="label">
-                  <lookup name="place" type="PfsPlacsItem"/>
+                  <lookup name="place" type="PfsBookmarksItem"/>
                 </binding>
+                <property name="wrap-mode">word-char</property>
               </object>
             </child>
           </object>

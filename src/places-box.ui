@@ -4,22 +4,19 @@
   <requires lib="libadwaita" version="1.0"/>
   <template class="PfsPlacesBox" parent="AdwBin">
     <property name="child">
-      <object class="GtkBox">
-        <property name="orientation">vertical</property>
+      <object class="GtkScrolledWindow">
+        <property name="vscrollbar-policy">automatic</property>
+        <property name="hscrollbar-policy">never</property>
+        <property name="propagate-natural-height">True</property>
         <child>
           <object class="GtkFlowBox" id="flow_box">
+            <property name="valign">end</property>
             <property name="selection-mode">none</property>
             <property name="margin-top">6</property>
             <property name="margin-bottom">6</property>
             <property name="margin-start">6</property>
             <property name="margin-end">6</property>
             <signal name="child-activated" handler="on_item_activated" swapped="true"/>
-          </object>
-        </child>
-        <child>
-          <object class="PfsPathBar" id="path_bar">
-            <property name="folder" bind-source="PfsPlacesBox" bind-property="folder" bind-flags="sync-create"/>
-            <signal name="new-uri" handler="on_new_uri" swapped="true"/>
           </object>
         </child>
       </object>
