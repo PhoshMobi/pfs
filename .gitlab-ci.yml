@@ -42,7 +42,7 @@ variables:
   RUST_BACKTRACE: "full"
   RUST_VERSION: stable
   GIT_SUBMODULE_STRATEGY: recursive
-  DEBIAN_IMAGE: $CI_REGISTRY/world/phosh/pfs/debian:v0.0.2025-11-20.1
+  DEBIAN_IMAGE: $CI_REGISTRY/world/phosh/pfs/debian:v0.0.2026-05-11
   SID_PKGS: rustc rust-clippy rustfmt
 
 .common_before_script: &common_before_script
