@@ -230,10 +230,10 @@
                       <object class="GtkBox">
                         <property name="spacing">6</property>
                         <child>
-                      <object class="PfsDirStack" id="dir_stack">
-                        <property name="folder" bind-source="PfsFileSelector" bind-property="current-folder" bind-flags="sync-create"/>
-                        <signal name="new-uri" handler="on_new_uri" swapped="true"/>
-                      </object>
+                          <object class="PfsDirStack" id="dir_stack">
+                            <property name="folder" bind-source="PfsFileSelector" bind-property="current-folder" bind-flags="sync-create"/>
+                            <signal name="new-uri" handler="on_new_uri" swapped="true"/>
+                          </object>
                         </child>
                         <child>
                           <object class="GtkButton">
