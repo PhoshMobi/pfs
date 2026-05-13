@@ -1,6 +1,6 @@
 include:
  - project: 'World/Phosh/meta-phosh'
-   ref: 'c9e1eabe9b8e21ab7b4c754ea2310c7e42379b61'
+   ref: '4a59c2bce9fe230614431a21638a05f3a30da7f3'
    file: '/ci/phosh-common-jobs.yml'
  - project: 'Infrastructure/freedesktop-ci-templates'
    ref: 'd03cddbcff35f26861429fc816c00323f48e99af'
@@ -42,7 +42,7 @@ variables:
   RUST_BACKTRACE: "full"
   RUST_VERSION: stable
   GIT_SUBMODULE_STRATEGY: recursive
-  DEBIAN_IMAGE: $CI_REGISTRY/world/phosh/pfs/debian:v0.0.2025-11-20.1
+  DEBIAN_IMAGE: $CI_REGISTRY/world/phosh/pfs/debian:v0.0.2026-05-11
   SID_PKGS: rustc rust-clippy rustfmt
 
 .common_before_script: &common_before_script

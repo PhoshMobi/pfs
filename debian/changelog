@@ -1,3 +1,63 @@
+pfs (0.1.0) experimental; urgency=medium
+
+  [ Guido Günther ]
+  * packaging: Make sure to depend on the schema
+  * file-selector: Add builder pattern.
+    Gives more type-safety when building the dialog
+  * demo-window: Use file selector builder
+  * pfs-open: Use file selector builder
+  * tests: Use file selector builder
+
+  [ Gotam Gorabh ]
+  * file-props: Add builder pattern
+  * grid-items: Use file props builder
+  * examples: Use file props builder
+  * util: Don't export `stateful_action!` macro.
+    It is an internal helper used only by `file_selector`, but `#[macro_export]`
+    was leaking it as `pfs::stateful_action` in the public API.
+  * tree: Document rust public API
+  * ci: Add deploy ci.
+    Publish target/doc via gitlab pages
+    Closes: https://gitlab.gnome.org/World/Phosh/pfs/-/issues/4
+  * ci: Redirect pages root to crate docs
+  * readme: Link to API docs.
+    Closes: https://gitlab.gnome.org/World/Phosh/pfs/-/work_items/24
+
+  [ nicole mikołajczyk ]
+  * po: Add Polish translation
+  * po: Update LINGUAS
+
+  [ Arun Mani J ]
+  * tree: Drop `glib_macros` dependency
+  * tree: Update dependencies
+  * file-selector: Move path-bar here.
+    Will allow us to extend the bottom sheet without disturbing the path-bar.
+  * places-box: Move the scrolled window here.
+    Lets places-box control the scrolling.
+  * file-selector: Wrap places-box in `AdwViewStack`
+    Will allow us to add more tabs to the sheet. Also add `AdwInlineViewSwitcher`.
+  * tree: Reindent UI files
+  * places-box: Remove `folder` property.
+    No longer required.
+  * places-item: Drop the impostor UI file
+  * places-box: Align to bottom.
+    Protects the box from spanning full height when the other tabs have taller widgets.
+  * tree: Drop `self.imp().obj()` pattern
+  * tree: Add `BookmarksItem`
+    Similar to `PlacesItem`.
+  * tree: Add `BookmarksBox`
+  * file-selector: Show bookmarks.
+    Closes: https://gitlab.gnome.org/World/Phosh/pfs/-/issues/3
+  * grid-item: Add and use helper `get_file`
+  * grid-item: Unwrap menu items.
+    We can add it back once we have more items and need logical grouping.
+  * file-selector: Add API to query & modify bookmarks
+  * grid-item: Add feature to add and remove bookmarks
+  * file-selector: Let current directory be bookmarked
+  * file-selector: Indent UI file
+
+ -- Guido Günther <agx@sigxcpu.org>  Mon, 11 May 2026 10:16:17 +0200
+
 pfs (0.0.8) experimental; urgency=medium
 
   [ Arun Mani J ]
