@@ -44,7 +44,10 @@ mod imp {
             klass.bind_template_instance_callbacks();
 
             klass.install_action("win.open-file", None, move |win, _, _| {
-                win.open_file();
+                win.open_file(false);
+            });
+            klass.install_action("win.open-files", None, move |win, _, _| {
+                win.open_file(true);
             });
             klass.install_action("win.save-file", None, move |win, _, _| {
                 win.save_file();
@@ -96,8 +99,8 @@ impl PfsDemoWindow {
         self.imp().selected_label.set_label(&uris[0]);
     }
 
-    pub fn open_file(&self) {
-        glib::g_debug!(LOG_DOMAIN, "Open File");
+    pub fn open_file(&self, multiple: bool) {
+        glib::g_debug!(LOG_DOMAIN, "Open File (multiple: {multiple})");
         let filters = gio::ListStore::with_type(gtk::FileFilter::static_type());
         filters.append(
             &glib::Object::builder::<gtk::FileFilter>()
@@ -118,12 +121,18 @@ impl PfsDemoWindow {
         filters.append(&all_files);
         let pos = filters.find(&all_files).unwrap();
 
+        let title = if multiple {
+            "Select Files"
+        } else {
+            "Select a File"
+        };
         let file_selector = FileSelectorBuilder::new()
             .accept_label("Done")
-            .title("Select a File")
+            .title(title)
             .current_folder(gio::File::for_path("/home"))
             .filters(filters.into())
             .current_filter(pos)
+            .multiple(multiple)
             .build();
 
         let empty: Vec<(String, String)> = Vec::new();

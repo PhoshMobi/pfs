@@ -237,6 +237,7 @@ impl PfsOpenApplication {
             .accept_label(&gettextrs::gettext("Open"))
             .title(&gettextrs::gettext("Select a File"))
             .current_folder(dir.clone())
+            .multiple(true)
             .close_on_done(false)
             .build();
 

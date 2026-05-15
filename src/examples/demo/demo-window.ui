@@ -38,6 +38,14 @@
                   </object>
                 </child>
                 <child>
+                  <object class="GtkButton" id="open_files_button">
+                    <property name="label" translatable="yes">_Open Files…</property>
+                    <property name="use-underline">True</property>
+                    <property name="valign">center</property>
+                    <property name="action-name">win.open-files</property>
+                  </object>
+                </child>
+                <child>
                   <object class="GtkButton">
                     <property name="label" translatable="yes">_Save File…</property>
                     <property name="use-underline">True</property>
