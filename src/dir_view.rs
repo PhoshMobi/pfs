@@ -544,6 +544,26 @@ impl DirView {
         false
     }
 
+    fn on_item_released(&self, list_item: gtk::ListItem, gesture: &gtk::GestureClick) {
+        let binding = self.imp().selection_model.borrow();
+        let model = binding.as_ref().unwrap();
+
+        let position = list_item.position();
+        let selected = model.is_selected(position);
+        glib::g_debug!(
+            LOG_DOMAIN,
+            "Item at position {position} is selected: {selected}"
+        );
+
+        if selected {
+            model.unselect_item(position);
+        } else {
+            model.select_item(position, false);
+        }
+
+        gesture.set_state(gtk::EventSequenceState::Claimed);
+    }
+
     #[template_callback]
     fn on_item_setup(&self, object: glib::Object) {
         let list_item = object.downcast_ref::<gtk::ListItem>().unwrap();
@@ -556,6 +576,16 @@ impl DirView {
         self.bind_property("thumbnail-mode", &grid_item, "thumbnail-mode")
             .sync_create()
             .build();
+
+        let gesture = gtk::GestureClick::new();
+        gesture.connect_released(glib::clone!(
+            #[weak(rename_to=this)]
+            self,
+            #[weak]
+            list_item,
+            move |gesture, _, _, _| this.on_item_released(list_item, gesture)
+        ));
+        grid_item.add_controller(gesture);
 
         list_item.set_child(Some(&grid_item));
     }
