@@ -31,11 +31,11 @@ cargo_opt += ['--target-dir', meson.project_build_root() / 'src']
 cargo_env = ['CARGO_HOME=' + meson.project_build_root() / 'cargo-home']
 cargo_env += ['PFS_RESOURCE_DIR=' + meson.current_build_dir()]
 
-if get_option('buildtype') == 'release'
+if get_option('debug')
+  rust_target = 'debug'
+else
   cargo_opt += ['--release']
   rust_target = 'release'
-else
-  rust_target = 'debug'
 endif
 
 pfs_inc = include_directories('include/')
