@@ -241,6 +241,7 @@
                             <binding name="icon-name">
                               <closure type="gchararray" function="folder_to_bookmark_icon_name">
                                 <lookup name="current-folder">PfsFileSelector</lookup>
+                                <lookup name="available">bookmarks_box</lookup>
                               </closure>
                             </binding>
                             <signal name="clicked" handler="on_bookmark_clicked" swapped="true"/>
