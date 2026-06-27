@@ -1,3 +1,19 @@
+pfs (0.1.1) experimental; urgency=medium
+
+  [ Achill Gilgenast ]
+  * build: Use debug option to detect development versions
+    meson's buildtype option contains not only if the build is not using debug,
+    but also configures the optimization option.
+    Ref: https://mesonbuild.com/Builtin-options.html#details-for-buildtype
+
+  [ Arun Mani J ]
+  * file-selector: Watch bookmarks availability too.
+    Once the bookmarks have been loaded, we need to synchronize the current directory's bookmark status.
+    So add it to the lookup function so GTK calls it when the property changes.
+    Closes: https://gitlab.gnome.org/World/Phosh/pfs/-/work_items/28
+
+ -- Guido Günther <agx@sigxcpu.org>  Sat, 27 Jun 2026 16:17:16 +0200
+
 pfs (0.1.0) experimental; urgency=medium
 
   [ Guido Günther ]
