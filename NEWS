@@ -1,3 +1,13 @@
+pfs 0.1.1
+---------
+Released June 2026
+* Fix bookmark initial state sync
+* Issues fixed:
+    * https://gitlab.gnome.org/World/Phosh/pfs/-/work_items/28
+* Contributors:
+    * Achill Gilgenast
+    * Arun Mani J
+
 pfs 0.1.0
 ---------
 Released May 2026
