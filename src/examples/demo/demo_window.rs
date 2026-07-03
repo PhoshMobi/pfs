@@ -6,8 +6,8 @@
  * Author: Guido Günther <agx@sigxcpu.org>
  */
 
+use adw::prelude::*;
 use adw::subclass::prelude::*;
-use gtk::prelude::*;
 use gtk::{gio, glib};
 use std::cell::RefCell;
 
@@ -22,13 +22,13 @@ mod imp {
     #[template(resource = "/mobi/phosh/FileSelectorDemo/demo-window.ui")]
     pub struct PfsDemoWindow {
         #[template_child]
-        pub selected_label: TemplateChild<gtk::Label>,
+        pub selected_row: TemplateChild<adw::ActionRow>,
 
         #[template_child]
-        pub choices_label: TemplateChild<gtk::Label>,
+        pub choices_row: TemplateChild<adw::ActionRow>,
 
         #[template_child]
-        pub filter_label: TemplateChild<gtk::Label>,
+        pub filter_row: TemplateChild<adw::ActionRow>,
 
         pub file_selector: RefCell<Option<FileSelector>>,
     }
@@ -96,7 +96,7 @@ impl PfsDemoWindow {
             Some(vec) => vec,
         };
 
-        self.imp().selected_label.set_label(&uris[0]);
+        self.imp().selected_row.set_subtitle(&uris[0]);
     }
 
     pub fn open_file(&self, multiple: bool) {
@@ -157,22 +157,23 @@ impl PfsDemoWindow {
                     glib::g_debug!(LOG_DOMAIN, "File dialog done, result: {success:#?}");
                     let selected = selector.selected();
 
-                    this.imp().selected_label.set_label("");
-                    this.imp().choices_label.set_label("");
-                    this.imp().filter_label.set_label("");
+                    this.imp().selected_row.set_subtitle("");
+                    this.imp().choices_row.set_subtitle("");
+                    this.imp().filter_row.set_subtitle("");
 
                     if success {
                         let uris = match selected {
                             None => vec!["".to_string()],
                             Some(vec) => vec,
                         };
-                        this.imp().selected_label.set_label(&uris[0]);
+                        let pretty_uris = uris.join("\n");
+                        this.imp().selected_row.set_subtitle(&pretty_uris);
 
                         let text = match selector.selected_choices() {
                             Some(choices) => choices.to_string(),
                             None => "".to_string(),
                         };
-                        this.imp().choices_label.set_label(&text);
+                        this.imp().choices_row.set_subtitle(&text);
 
                         let pos = selector.current_filter();
                         let text = match selector.filters() {
@@ -187,7 +188,7 @@ impl PfsDemoWindow {
                             },
                             None => "".to_string(),
                         };
-                        this.imp().filter_label.set_label(&text);
+                        this.imp().filter_row.set_subtitle(&text);
                     }
                 }
             ),

@@ -66,27 +66,18 @@
             <child>
               <object class="AdwPreferencesGroup">
                 <child>
-                  <object class="AdwActionRow">
+                  <object class="AdwActionRow" id="selected_row">
                     <property name="title" translatable="yes">Uri</property>
-                    <child>
-                      <object class="GtkLabel" id="selected_label"/>
-                    </child>
                   </object>
                 </child>
                 <child>
-                  <object class="AdwActionRow">
+                  <object class="AdwActionRow" id="choices_row">
                     <property name="title" translatable="yes">Choices</property>
-                    <child>
-                      <object class="GtkLabel" id="choices_label"/>
-                    </child>
                   </object>
                 </child>
                 <child>
-                  <object class="AdwActionRow">
+                  <object class="AdwActionRow" id="filter_row">
                     <property name="title" translatable="yes">Filter</property>
-                    <child>
-                      <object class="GtkLabel" id="filter_label"/>
-                    </child>
                   </object>
                 </child>
               </object>
