@@ -162,6 +162,10 @@ pub mod imp {
         #[property(get, set = Self::set_mode, builder(FileSelectorMode::default()))]
         pub mode: RefCell<FileSelectorMode>,
 
+        // Whether multiple files can be selected.
+        #[property(get, set)]
+        pub multiple: Cell<bool>,
+
         // The additional choices to present
         #[property(get, set = Self::set_choices, builder(glib::VariantTy::ARRAY))]
         pub choices: RefCell<Option<glib::Variant>>,
@@ -973,6 +977,14 @@ impl FileSelectorBuilder {
     /// regardless of this property.
     pub fn close_on_done(mut self, close_on_done: bool) -> Self {
         self.builder = self.builder.property("close-on-done", close_on_done);
+        self
+    }
+
+    /// Sets the `multiple` property.
+    ///
+    /// Setting it to `true` allows selecting multiple files. Defaults to `false`.
+    pub fn multiple(mut self, multiple: bool) -> Self {
+        self.builder = self.builder.property("multiple", multiple);
         self
     }
 
