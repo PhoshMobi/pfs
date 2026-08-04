@@ -704,6 +704,24 @@ impl FileSelector {
             )
         );
 
+        stateful_action!(
+            actions,
+            "select-multiple",
+            false,
+            glib::clone!(
+                #[weak(rename_to = this)]
+                self,
+                move |action, _| {
+                    let state = action.state().unwrap();
+                    let action_state: bool = state.get().unwrap();
+                    let select_multiple = !action_state;
+                    action.set_state(&select_multiple.to_variant());
+
+                    this.imp().dir_view.get().set_multiple(select_multiple);
+                }
+            )
+        );
+
         let binding = self.imp().settings.borrow();
         let (sort_by_value, reversed) = if let Some(settings) = binding.as_ref() {
             let sort_by_value = settings.enum_("sort-by");
@@ -757,6 +775,12 @@ impl FileSelector {
         );
 
         self.insert_action_group("file-selector", Some(&actions));
+
+        let select_multiple_action = actions.lookup_action("select-multiple").unwrap();
+        self.bind_property("multiple", &select_multiple_action, "enabled")
+            .sync_create()
+            .build();
+        self.imp().dir_view.set_multiple(false);
 
         // Keep `current-filter` in sync with action
         let filter_action = actions.lookup_action("set-filter").unwrap();
