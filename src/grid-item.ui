@@ -60,6 +60,7 @@
     <item>
       <attribute name="label" translatable="yes">Properties</attribute>
       <attribute name="action">grid-item.show-property</attribute>
+      <attribute name="hidden-when">action-disabled</attribute>
     </item>
     <item>
       <attribute name="label" translatable="yes">Copy Name</attribute>
