@@ -238,10 +238,7 @@ impl GridItem {
     fn show_context_menu(&self, x: f64, y: f64) {
         let fs = self.get_file_selector();
 
-        // Disable context menu when used as portal
-        if fs.close_on_done() {
-            return;
-        }
+        self.action_set_enabled("grid-item.show-property", !fs.close_on_done());
 
         let imp = self.imp();
         let popover = &imp.context_menu;
