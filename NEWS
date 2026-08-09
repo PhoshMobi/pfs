@@ -1,3 +1,13 @@
+pfs 0.1.2
+---------
+Released August 2026
+* Allow multi file selection
+* Issues fixed:
+    * https://gitlab.gnome.org/World/Phosh/pfs/-/work_items/23
+    * https://gitlab.gnome.org/World/Phosh/pfs/-/work_items/29
+* Contributors:
+    * Arun Mani J
+
 pfs 0.1.1
 ---------
 Released June 2026

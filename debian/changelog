@@ -1,3 +1,31 @@
+pfs (0.1.2) experimental; urgency=medium
+
+  [ Arun Mani J ]
+  * dir-view: Use the selection model directly
+  * dir-view: Use only `GtkSelectionModel` APIs.
+    Will make it easier to add a multi-selection model without a lot of if-else based on the model type.
+  * dir-view: Move `selection_model` to code.
+    Will make it simple to choose the right model based on `multiple` option.
+  * dir-view: Allow multiple files to be selected
+  * file-selector: Allow multiple files to be selected.
+    Closes: https://gitlab.gnome.org/World/Phosh/pfs/-/work_items/23
+  * examples: Allow selecting multiple files
+  * examples: Use subtitles to display results.
+    And join the URIs by newline before displaying.
+  * dir-view: Hijack clicks to implement multiselect
+    `Gtk.MultiSelection` does not have a native interface to select multiple items on touch UI. On
+    devices with keyboard, user can use `Ctrl` etc. So hijack the `pressed` event of grid-item and
+    manually select and unselect the items when user clicks on them.
+  * grid-item: Show context menu all the time.
+    Only disable showing properties because it opens a new window on top of current window which can be
+    confusing on portal requests.
+  * file-selector: Materialize `multiple` in dir-view
+    `PfsDirView` would allow multiple if and only if `request asks multiple && user prefers multiple`.
+  * grid-item: Allow to select multiple files.
+    Closes: https://gitlab.gnome.org/World/Phosh/pfs/-/work_items/29
+
+ -- Guido Günther <agx@sigxcpu.org>  Sat, 08 Aug 2026 21:44:09 +0200
+
 pfs (0.1.1) experimental; urgency=medium
 
   [ Achill Gilgenast ]
