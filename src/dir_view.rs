@@ -1027,4 +1027,11 @@ impl DirView {
             self.select_item_real(item);
         }
     }
+
+    pub fn set_monitored(&self, monitored: bool) {
+        let imp = self.imp();
+        let dlist = imp.directory_list.get();
+
+        dlist.set_monitored(monitored);
+    }
 }

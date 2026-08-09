@@ -206,6 +206,51 @@
                             </property>
                           </object>
                         </property>
+                        <property name="end-widget">
+                          <object class="GtkMenuButton">
+                            <property name="hexpand">true</property>
+                            <property name="margin-top">6</property>
+                            <property name="margin-bottom">6</property>
+                            <property name="margin-start">6</property>
+                            <property name="margin-end">6</property>
+                            <property name="direction">up</property>
+                            <property name="icon-name">folder-new-symbolic</property>
+                            <property name="popover">
+                              <object class="GtkPopover">
+                                <property name="position">top</property>
+                                <child>
+                                  <object class="GtkBox">
+                                    <property name="spacing">6</property>
+                                    <property name="orientation">vertical</property>
+                                    <child>
+                                      <object class="GtkEntry" id="new_folder_entry">
+                                        <property name="placeholder-text" translatable="yes">Enter folder name…</property>
+                                      </object>
+                                    </child>
+                                    <child>
+                                      <object class="AdwBanner" id="new_folder_msg_banner">
+                                        <property name="revealed">false</property>
+                                      </object>
+                                    </child>
+                                    <child>
+                                      <object class="GtkButton">
+                                        <property name="label" translatable="yes">Create</property>
+                                        <binding name="sensitive">
+                                          <closure type="gboolean" function="folder_name_exists">
+                                            <constant type="AdwBanner">new_folder_msg_banner</constant>
+                                            <lookup name="text">new_folder_entry</lookup>
+                                          </closure>
+                                        </binding>
+                                        <signal name="clicked" handler="on_create_new_folder_clicked" swapped="true"/>
+                                      </object>
+                                    </child>
+                                  </object>
+                                </child>
+                              </object>
+                            </property>
+                            <property name="visible" bind-source="PfsFileSelector" bind-property="can-write" bind-flags="sync-create"/>
+                          </object>
+                        </property>
                       </object>
                     </property>
                   </object>

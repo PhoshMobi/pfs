@@ -121,12 +121,22 @@ pub mod imp {
         #[template_child]
         pub search_entry: TemplateChild<gtk::SearchEntry>,
 
+        #[template_child]
+        pub new_folder_entry: TemplateChild<gtk::Entry>,
+
+        #[template_child]
+        pub new_folder_msg_banner: TemplateChild<adw::Banner>,
+
         pub(super) choices_actions: RefCell<Option<gio::SimpleActionGroup>>,
 
         pub(super) settings: RefCell<Option<gio::Settings>>,
 
         #[property(set, get)]
         pub done: Cell<bool>,
+
+        // Whether we have write access for the current folder
+        #[property(get, set)]
+        pub can_write: Cell<bool>,
 
         //
         // Properties mapping to the portal spec
@@ -219,6 +229,33 @@ pub mod imp {
             let obj = self.obj();
             obj.setup_gsettings();
             obj.setup_gactions();
+
+            obj.bind_property("current-folder", &*obj, "can-write")
+                .transform_to(|binding: &glib::Binding, folder: Option<gio::File>| {
+                    let (Some(this), Some(folder)) = (binding.source(), folder) else {
+                        return Some(false);
+                    };
+
+                    let attribute = gio::FILE_ATTRIBUTE_ACCESS_CAN_WRITE;
+                    folder.query_info_async(
+                        attribute,
+                        gio::FileQueryInfoFlags::NONE,
+                        glib::source::Priority::DEFAULT,
+                        gio::Cancellable::NONE,
+                        |result| {
+                            let this = this.downcast::<super::FileSelector>().unwrap();
+                            let can_write = match result {
+                                Ok(file_info) => file_info.boolean(attribute),
+                                Err(_) => false,
+                            };
+                            this.set_can_write(can_write);
+                        },
+                    );
+
+                    Some(false)
+                })
+                .sync_create()
+                .build();
         }
 
         fn signals() -> &'static [Signal] {
@@ -409,6 +446,16 @@ pub mod imp {
             Some(ret.to_variant())
         }
 
+        fn get_file_for_name(&self, filename: &str) -> Option<gio::File> {
+            if filename.is_empty() {
+                return None;
+            }
+
+            let cur_folder = self.obj().current_folder()?.path()?;
+
+            Some(gio::File::for_path(cur_folder.join(filename)))
+        }
+
         #[template_callback]
         fn on_accept_clicked(&self) {
             glib::g_debug!(LOG_DOMAIN, "Selection done");
@@ -571,6 +618,95 @@ pub mod imp {
             let search_term = entry.text();
 
             self.dir_view.set_search_term(search_term);
+        }
+
+        #[template_callback]
+        fn on_create_new_folder_clicked(&self, _button: gtk::Button) {
+            use gio::IOErrorEnum;
+
+            let entry = self.new_folder_entry.get();
+            let Some(file) = self.get_file_for_name(&entry.buffer().text()) else {
+                return;
+            };
+            let dir_view = self.dir_view.get();
+
+            // If we don't disable the monitoring before creating a subdirectory
+            // then when it's created and we "enter" it (change `GtkDirectoryList:file`
+            // to this new subdirectory), the `GFileMonitor` of the directory list will
+            // report (correctly) that a new directory was created. Since we are now
+            // inside the new directory, we will end up processing a "stale" signal.
+            // With this we can avoid processing the signal and re-enable monitoring
+            // after the directory creation succeeds or fails.
+            dir_view.set_monitored(false);
+            file.make_directory_async(
+                glib::Priority::DEFAULT,
+                gio::Cancellable::NONE,
+                glib::clone!(
+                    #[strong]
+                    file,
+                    #[weak(rename_to = this)]
+                    self,
+                    move |result| {
+                        use gettextrs::gettext;
+
+                        dir_view.set_monitored(true);
+                        let Err(e) = result else {
+                            this.obj().set_current_folder(file);
+                            entry.set_text("");
+
+                            return;
+                        };
+
+                        let reason = if let Some(file_error) = e.kind::<IOErrorEnum>() {
+                            match file_error {
+                                IOErrorEnum::Exists => gettext("already exists"),
+                                IOErrorEnum::PermissionDenied => gettext("permission denied"),
+                                IOErrorEnum::FilenameTooLong => gettext("name too long"),
+                                IOErrorEnum::InvalidFilename => gettext("invalid filename"),
+                                _ => gettext("unexpected error"),
+                            }
+                        } else {
+                            String::new()
+                        };
+
+                        let msg = if reason.is_empty() {
+                            gettext("Failed to create folder")
+                        } else {
+                            gettext("Failed to create folder: {}").replacen(
+                                "{}",
+                                reason.as_str(),
+                                1,
+                            )
+                        };
+
+                        let banner = this.new_folder_msg_banner.get();
+                        banner.set_title(msg.as_str());
+                        banner.set_revealed(true);
+                        entry.grab_focus_without_selecting();
+                        entry.add_css_class("error");
+                    }
+                ),
+            );
+        }
+
+        #[template_callback]
+        fn folder_name_exists(&self, banner: &adw::Banner, text: &str) -> bool {
+            let Some(file) = self.get_file_for_name(text) else {
+                return false;
+            };
+
+            let exists = file.query_exists(gio::Cancellable::NONE);
+            if exists {
+                let msg = gettextrs::gettext("Folder exists");
+                self.new_folder_entry.get().add_css_class("warning");
+                banner.set_title(msg.as_str());
+                banner.set_revealed(true);
+            } else {
+                self.new_folder_entry.get().set_css_classes(&[""]);
+                banner.set_revealed(false);
+            }
+
+            !exists
         }
     }
 }
