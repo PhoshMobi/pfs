@@ -10,3 +10,4 @@ Categories=Utility;
 Keywords=folder;filesystem;open;
 StartupNotify=true
 X-Purism-FormFactor=Workstation;Mobile;
+MimeType=inode/directory;
