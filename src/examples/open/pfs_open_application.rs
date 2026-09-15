@@ -9,7 +9,7 @@
 use adw::prelude::*;
 use adw::subclass::prelude::*;
 use gtk::{gdk, gio, glib};
-use std::cell::RefCell;
+use std::{cell::RefCell, path::PathBuf};
 
 use pfs::file_props::FileProps;
 use pfs::file_selector::{FileSelector, FileSelectorBuilder, FileSelectorMode};
@@ -118,7 +118,13 @@ mod imp {
 
         fn open(&self, files: &[gio::File], _hint: &str) {
             for file in files.iter() {
-                self.obj().open_directory(file);
+                let path = file.path().unwrap_or(PathBuf::from("/"));
+                let dir = if path.is_dir() {
+                    file
+                } else {
+                    &file.parent().unwrap_or(gio::File::for_path("/"))
+                };
+                self.obj().open_directory(dir);
             }
         }
 
