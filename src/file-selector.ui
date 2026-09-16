@@ -159,6 +159,18 @@
                             </property>
                           </object>
                         </child>
+                        <child>
+                          <object class="AdwViewStackPage">
+                            <property name="name">mounts</property>
+                            <property name="title" translatable="yes">Mounts</property>
+                            <property name="visible" bind-source="mounts_box" bind-property="available" bind-flags="sync-create"/>
+                            <property name="child">
+                              <object class="PfsMountsBox" id="mounts_box">
+                                <signal name="new-uri" handler="on_new_uri" swapped="true"/>
+                              </object>
+                            </property>
+                          </object>
+                        </child>
                       </object>
                     </child>
                     <child>

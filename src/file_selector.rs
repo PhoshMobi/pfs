@@ -39,6 +39,7 @@ use crate::{
     config::LOG_DOMAIN,
     dir_stack::DirStack,
     dir_view::DirView,
+    mounts_box::MountsBox,
     path_bar::PathBar,
     places_box::PlacesBox,
     util::{self, stateful_action},
@@ -93,6 +94,9 @@ pub mod imp {
 
         #[template_child]
         pub places_box: TemplateChild<PlacesBox>,
+
+        #[template_child]
+        pub mounts_box: TemplateChild<MountsBox>,
 
         #[template_child]
         pub path_bar: TemplateChild<PathBar>,

@@ -16,6 +16,8 @@ mod config;
 mod dir_stack;
 mod dir_view;
 mod grid_item;
+mod mount_item;
+mod mounts_box;
 mod path_bar;
 mod places_box;
 mod places_item;
