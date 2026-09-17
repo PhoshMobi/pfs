@@ -311,8 +311,8 @@
                         <property name="spacing">6</property>
                         <child>
                           <object class="GtkImage">
-                            <binding name="icon-name">
-                              <closure type="gchararray" function="folder_to_icon_name">
+                            <binding name="gicon">
+                              <closure type="GIcon" function="folder_to_gicon">
                                 <lookup name="current-folder">PfsFileSelector</lookup>
                               </closure>
                             </binding>

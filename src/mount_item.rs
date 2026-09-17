@@ -40,6 +40,10 @@ mod imp {
         #[property(get, set = Self::set_mounted)]
         mounted: Cell<bool>,
 
+        // Where the volume is mounted
+        #[property(get, set)]
+        location: RefCell<Option<gio::File>>,
+
         #[property(get, set)]
         busy: Cell<bool>,
     }

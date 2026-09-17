@@ -236,6 +236,7 @@ impl MountsBox {
                 item.set_place(mount.name());
                 item.set_gicon(mount.symbolic_icon());
                 item.set_mounted(true);
+                item.set_location(mount.default_location());
                 let loc = mount.default_location();
                 let uri = loc.uri();
                 glib::g_debug!(LOG_DOMAIN, "'{name}' is mounted at {uri}");
@@ -261,5 +262,42 @@ impl MountsBox {
             imp.available.set(true);
             self.notify_available();
         }
+    }
+
+    pub fn folder_to_name(&self, folder: &gio::File) -> Option<String> {
+        let mut child = self.imp().flow_box.first_child();
+
+        while let Some(widget) = child {
+            let flowbox_child = widget.downcast_ref::<gtk::FlowBoxChild>().unwrap();
+            let inner_child = flowbox_child.child().unwrap();
+            let mount_item = inner_child.downcast_ref::<MountItem>().unwrap();
+
+            let location = mount_item.location()?;
+            if location.equal(folder) {
+                return Some(mount_item.place());
+            }
+            child = widget.next_sibling();
+        }
+
+        None
+    }
+
+    pub fn folder_to_gicon(&self, folder: &gio::File) -> Option<gio::Icon> {
+        let mut child = self.imp().flow_box.first_child();
+
+        while let Some(widget) = child {
+            let flowbox_child = widget.downcast_ref::<gtk::FlowBoxChild>().unwrap();
+            let inner_child = flowbox_child.child().unwrap();
+            let mount_item = inner_child.downcast_ref::<MountItem>().unwrap();
+
+            let location = mount_item.location()?;
+            if location.equal(folder) {
+                return mount_item.gicon();
+            }
+
+            child = widget.next_sibling();
+        }
+
+        None
     }
 }
