@@ -23,9 +23,6 @@
                 <accessibility>
                   <relation name="labelled-by">label</relation>
                 </accessibility>
-                <style>
-                  <class name="dim-label"/>
-                </style>
               </object>
             </child>
             <child>
@@ -38,9 +35,6 @@
                   <lookup name="place" type="PfsPlacesItem"/>
                 </binding>
                 <property name="wrap-mode">word-char</property>
-                <style>
-                  <class name="dim-label"/>
-                </style>
               </object>
             </child>
           </object>

@@ -159,6 +159,18 @@
                             </property>
                           </object>
                         </child>
+                        <child>
+                          <object class="AdwViewStackPage">
+                            <property name="name">mounts</property>
+                            <property name="title" translatable="yes">Mounts</property>
+                            <property name="visible" bind-source="mounts_box" bind-property="available" bind-flags="sync-create"/>
+                            <property name="child">
+                              <object class="PfsMountsBox" id="mounts_box">
+                                <signal name="new-uri" handler="on_new_uri" swapped="true"/>
+                              </object>
+                            </property>
+                          </object>
+                        </child>
                       </object>
                     </child>
                     <child>
@@ -299,8 +311,8 @@
                         <property name="spacing">6</property>
                         <child>
                           <object class="GtkImage">
-                            <binding name="icon-name">
-                              <closure type="gchararray" function="folder_to_icon_name">
+                            <binding name="gicon">
+                              <closure type="GIcon" function="folder_to_gicon">
                                 <lookup name="current-folder">PfsFileSelector</lookup>
                               </closure>
                             </binding>

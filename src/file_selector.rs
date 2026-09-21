@@ -39,6 +39,7 @@ use crate::{
     config::LOG_DOMAIN,
     dir_stack::DirStack,
     dir_view::DirView,
+    mounts_box::MountsBox,
     path_bar::PathBar,
     places_box::PlacesBox,
     util::{self, stateful_action},
@@ -93,6 +94,9 @@ pub mod imp {
 
         #[template_child]
         pub places_box: TemplateChild<PlacesBox>,
+
+        #[template_child]
+        pub mounts_box: TemplateChild<MountsBox>,
 
         #[template_child]
         pub path_bar: TemplateChild<PathBar>,
@@ -504,15 +508,21 @@ pub mod imp {
             let Some(file) = self.obj().current_folder() else {
                 return "Unknown".to_string();
             };
-            util::folder_to_name(file)
+
+            self.mounts_box
+                .folder_to_name(&file)
+                .unwrap_or(util::folder_to_name(file))
         }
 
         #[template_callback]
-        fn folder_to_icon_name(&self) -> &str {
+        fn folder_to_gicon(&self) -> gio::Icon {
             let Some(file) = self.obj().current_folder() else {
-                return "folder-symbolic";
+                return gio::ThemedIcon::new("folder-symbolic").upcast();
             };
-            util::folder_to_icon_name(file)
+
+            self.mounts_box
+                .folder_to_gicon(&file)
+                .unwrap_or(gio::ThemedIcon::new(util::folder_to_icon_name(file)).upcast())
         }
 
         #[template_callback]
