@@ -3,6 +3,7 @@ src/file_props.rs
 src/file_selector.rs
 src/init.rs
 src/places_box.rs
+src/mount-item.rs
 src/util.rs
 
 src/bookmarks-box.ui
@@ -10,4 +11,5 @@ src/dir-view.ui
 src/file-props.ui
 src/file-selector.ui
 src/grid-item.ui
+src/mount-item.ui
 src/mounts-box.ui
