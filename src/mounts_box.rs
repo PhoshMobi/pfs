@@ -193,18 +193,34 @@ impl MountsBox {
                     let id = volume.identifier("class");
                     let name = volume.name();
 
-                    // TODO: add item
+                    // TODO: add local volumes items before network ones
                     if id != Some("network".into()) {
                         glib::g_debug!(LOG_DOMAIN, "'{name}' is a unhandled volume");
+                        let m = volume.get_mount();
+                        if let Some(mount) = m {
+                            let item = Object::builder::<MountItem>().build();
+                            item.set_place(mount.name());
+                            item.set_gicon(mount.symbolic_icon());
+                            item.set_mounted(true);
+                            item.set_location(mount.default_location());
+                            let loc = mount.default_location();
+                            let uri = loc.uri();
+                            glib::g_debug!(LOG_DOMAIN, "'{name}' is mounted at {uri}");
+                            item.set_uri(uri);
+                            imp.flow_box.append(&item);
+                        } else {
+                            glib::g_warning!(LOG_DOMAIN, "'{name}' is a unhandled volume");
+                        }
                         continue;
+                    } else {
+                        glib::g_warning!(LOG_DOMAIN, "'{name}' is a unhandled network volume");
                     }
-                    glib::g_warning!(LOG_DOMAIN, "'{name}' is a unhandled network volume");
                 }
             } else {
                 let name = drive.name();
 
                 if drive.is_removable() {
-                    // TODO: add item
+                    // TODO: add item for mountable, removable drive
                     glib::g_warning!(LOG_DOMAIN, "'{name}' is a unhandled removeable drive");
                 } else {
                     glib::g_debug!(LOG_DOMAIN, "'{name}' has no usable volumes");
@@ -212,18 +228,19 @@ impl MountsBox {
             }
         }
 
+        // Add network volumes that don't have drive
         let volumes = volume_monitor.volumes();
         for volume in volumes.iter() {
             let id = volume.identifier("class");
             let name = volume.name();
 
-            if volume.drive().is_some() {
-                glib::g_debug!(LOG_DOMAIN, "'{name}' has drive, ignoring");
+            if id != Some("network".into()) {
+                glib::g_debug!(LOG_DOMAIN, "'{name}' is not a network volume");
                 continue;
             }
 
-            if id != Some("network".into()) {
-                glib::g_debug!(LOG_DOMAIN, "'{name}' is not a network volume");
+            if volume.drive().is_some() {
+                glib::g_debug!(LOG_DOMAIN, "'{name}' has drive, ignoring");
                 continue;
             }
 
