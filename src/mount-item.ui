@@ -56,5 +56,51 @@
         </property>
       </object>
     </child>
+    <child>
+      <object class="GtkGestureLongPress">
+        <property name="touch-only">False</property>
+        <signal name="pressed" handler="on_long_press_pressed" swapped="yes"/>
+      </object>
+    </child>
+    <child>
+      <object class="GtkGestureClick">
+        <property name="button">3</property>
+        <signal name="pressed" handler="on_right_click_pressed" swapped="yes"/>
+      </object>
+    </child>
   </template>
+  <object class="GtkPopoverMenu" id="context_menu">
+    <property name="menu-model">context_menu_model</property>
+    <property name="autohide">True</property>
+    <property name="has-arrow">True</property>
+  </object>
+  <menu id="context_menu_model">
+    <section>
+      <item>
+        <attribute name="label" translatable="yes">Connect</attribute>
+        <attribute name="action">mount-item.connect</attribute>
+        <attribute name="hidden-when">action-disabled</attribute>
+      </item>
+      <item>
+        <attribute name="label" translatable="yes">Disconnect</attribute>
+        <attribute name="action">mount-item.disconnect</attribute>
+        <attribute name="hidden-when">action-disabled</attribute>
+      </item>
+      <item>
+        <attribute name="label" translatable="yes">Mount</attribute>
+        <attribute name="action">mount-item.mount</attribute>
+        <attribute name="hidden-when">action-disabled</attribute>
+      </item>
+      <item>
+        <attribute name="label" translatable="yes">Unmount</attribute>
+        <attribute name="action">mount-item.unmount</attribute>
+        <attribute name="hidden-when">action-disabled</attribute>
+      </item>
+      <item>
+        <attribute name="label" translatable="yes">Eject</attribute>
+        <attribute name="action">mount-item.eject</attribute>
+        <attribute name="hidden-when">action-disabled</attribute>
+      </item>
+    </section>
+  </menu>
 </interface>
