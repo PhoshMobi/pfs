@@ -119,12 +119,19 @@ mod imp {
         fn open(&self, files: &[gio::File], _hint: &str) {
             for file in files.iter() {
                 let path = file.path().unwrap_or(PathBuf::from("/"));
-                let dir = if path.is_dir() {
-                    file
+                let (dir, selection) = if path.is_dir() {
+                    (file, None)
                 } else {
-                    &file.parent().unwrap_or(gio::File::for_path("/"))
+                    (
+                        &file.parent().unwrap_or(gio::File::for_path("/")),
+                        Some(file),
+                    )
                 };
-                self.obj().open_directory(dir);
+                let fs = self.obj().open_directory(dir);
+                if let Some(selection) = selection {
+                    glib::g_debug!(LOG_DOMAIN, "Selecting {}", selection.uri());
+                    fs.select_item(selection);
+                }
             }
         }
 
