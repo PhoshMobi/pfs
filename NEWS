@@ -1,3 +1,15 @@
+pfs 0.2.0
+---------
+Released October 2026
+* Allow to create folders when saving files
+* Allow to mount/unmount network shares and sdcards
+* Issues fixed:
+    * https://gitlab.gnome.org/World/Phosh/pfs/-/issues/9
+    * https://gitlab.gnome.org/World/Phosh/pfs/-/work_items/26
+* Contributors:
+    * Guido Günther
+    * Rudra Pratap Singh
+
 pfs 0.1.2
 ---------
 Released August 2026

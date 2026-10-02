@@ -1,3 +1,35 @@
+pfs (0.2.0) experimental; urgency=medium
+
+  [ Rudra Pratap Singh ]
+  * dir-view: Allow to set directory list monitoring
+  * file-selector: Allow to create folder when saving files.
+    Closes: https://gitlab.gnome.org/World/Phosh/pfs/-/issues/9
+
+  [ Guido Günther ]
+  * open: Open containing folder.
+    If the last argument is not a directory we open the parent.
+  * data: Declare that we handle inode/directory
+  * places: Remove dim-label.
+    Otherwise it won't match other active icons in style
+  * file-selector: Add mounts tab.
+    This allows to open network mounts like dav drives as provided by
+    Nextcloud.
+  * file-selector: Match on mount items too.
+    This gives us nicer paths in bottom bar. If we get a lot of
+    mounts we could optimize iterating the flowbox with a hash map.
+  * pfs-open: Select item in folder.
+    When the passed filename is not a directory we currently open
+    the containing folder. This additionally selects the passed in
+    file.
+    Fixes: 73ec665 ("open: Open containing folder")
+  * mounts: Add mounted local volumes too
+  * mount-item: Add mount/unmount menu.
+    The actions do a round trip via the mounts-box so the box can show
+    spinners, switch dirs, etc if needed.
+    Closes: https://gitlab.gnome.org/World/Phosh/pfs/-/work_items/26
+
+ -- Guido Günther <agx@sigxcpu.org>  Fri, 02 Oct 2026 14:15:17 +0200
+
 pfs (0.1.2) experimental; urgency=medium
 
   [ Arun Mani J ]
