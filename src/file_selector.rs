@@ -218,6 +218,35 @@ pub mod imp {
                 gdk::ModifierType::NO_MODIFIER_MASK,
                 "window.close",
             );
+
+            Self::add_sort_keybinding(
+                klass,
+                gdk::Key::N,
+                gdk::ModifierType::CONTROL_MASK,
+                "name",
+                false,
+            );
+            Self::add_sort_keybinding(
+                klass,
+                gdk::Key::N,
+                gdk::ModifierType::CONTROL_MASK | gdk::ModifierType::SHIFT_MASK,
+                "name",
+                true,
+            );
+            Self::add_sort_keybinding(
+                klass,
+                gdk::Key::T,
+                gdk::ModifierType::CONTROL_MASK,
+                "mtime",
+                false,
+            );
+            Self::add_sort_keybinding(
+                klass,
+                gdk::Key::T,
+                gdk::ModifierType::CONTROL_MASK | gdk::ModifierType::SHIFT_MASK,
+                "mtime",
+                true,
+            );
         }
 
         fn instance_init(obj: &glib::subclass::InitializingObject<Self>) {
@@ -717,6 +746,24 @@ pub mod imp {
             }
 
             !exists
+        }
+
+        fn add_sort_keybinding<K>(
+            klass: &mut K,
+            key: gdk::Key,
+            mods: gdk::ModifierType,
+            field: &str,
+            descending: bool,
+        ) where
+            K: gtk::subclass::widget::WidgetClassExt,
+        {
+            let shortcut = gtk::Shortcut::with_arguments(
+                Some(gtk::KeyvalTrigger::new(key, mods)),
+                Some(gtk::NamedAction::new("file-selector.sort")),
+                &glib::Variant::from((field, descending)),
+            );
+
+            klass.add_shortcut(&shortcut);
         }
     }
 }
