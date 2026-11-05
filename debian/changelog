@@ -1,3 +1,10 @@
+pfs (0.2.1) experimental; urgency=medium
+
+  * file-selector: Add keybindings to toggle sorting.
+    Makes navigation a lot easier
+
+ -- Guido Günther <agx@sigxcpu.org>  Thu, 05 Nov 2026 09:39:16 +0100
+
 pfs (0.2.0) experimental; urgency=medium
 
   [ Rudra Pratap Singh ]
