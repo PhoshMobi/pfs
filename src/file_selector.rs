@@ -236,14 +236,14 @@ pub mod imp {
             Self::add_sort_keybinding(
                 klass,
                 gdk::Key::T,
-                gdk::ModifierType::CONTROL_MASK,
+                gdk::ModifierType::CONTROL_MASK | gdk::ModifierType::SHIFT_MASK,
                 "mtime",
                 false,
             );
             Self::add_sort_keybinding(
                 klass,
                 gdk::Key::T,
-                gdk::ModifierType::CONTROL_MASK | gdk::ModifierType::SHIFT_MASK,
+                gdk::ModifierType::CONTROL_MASK,
                 "mtime",
                 true,
             );
